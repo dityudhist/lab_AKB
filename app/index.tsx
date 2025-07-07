@@ -31,7 +31,7 @@ export default function Index() {
       <View style={{
         width: 200,
         height: 70,
-        borderRadius: 100,
+        borderRadius: 80,
         backgroundColor: 'blue',
         justifyContent: 'center',
         alignItems: "center"
