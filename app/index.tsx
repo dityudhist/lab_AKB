@@ -6,6 +6,7 @@ import {
   Animated,
   FlatList,
   Text,
+  Image,
 } from "react-native";
 
 const images = [
@@ -31,50 +32,38 @@ export default function App() {
 
   const handlePress = (index: number) => {
     const newStates = [...imageStates];
-    const img = newStates[index];
+    const currentImage = newStates[index];
 
-    // Batasi hanya sampai 2 klik
-    if (img.clickCount >= 2) return;
+    if (currentImage.clickCount >= 2) return;
 
-    if (!img.isAlt) {
-      img.isAlt = true;
+    if (!currentImage.isAlt) {
+      currentImage.isAlt = true;
     }
 
-    // Tentukan skala berdasarkan jumlah klik
-    let nextScale = 1;
-    if (img.clickCount === 0) {
-      nextScale = 1.2;
-    } else if (img.clickCount === 1) {
-      nextScale = 2.4;
-    }
+    const nextScale = currentImage.clickCount === 0 ? 1.2 : 2.4;
+    currentImage.clickCount += 1;
 
-    img.clickCount += 1;
-
-    Animated.timing(img.scale, {
+    Animated.timing(currentImage.scale, {
       toValue: nextScale,
       duration: 200,
       useNativeDriver: true,
     }).start();
 
+    // Trigger re-render
     setImageStates(newStates);
   };
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: { main: string; alt: string; id: number };
-    index: number;
-  }) => {
+  const renderItem = ({ item, index }: any) => {
     const state = imageStates[index];
 
     return (
       <Pressable onPress={() => handlePress(index)} style={styles.imageWrapper}>
         <View style={styles.fixedSizeCell}>
           <Animated.Image
-            source={{ uri: state?.isAlt ? item.alt : item.main }}
+            source={{ uri: state.isAlt ? item.alt : item.main }}
             style={[styles.image, { transform: [{ scale: state.scale }] }]}
             resizeMode="cover"
+            onError={() => console.warn(`Gagal memuat gambar id: ${item.id}`)}
           />
         </View>
       </Pressable>
@@ -101,9 +90,9 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-    justifyContent: "center",
+    paddingTop: 50,
     alignItems: "center",
+    backgroundColor: "#f5f5f5",
   },
   imageWrapper: {
     margin: 5,
