@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 
-// Data: 9 gambar utama dan 9 gambar alternatif
+// 9 gambar utama & 9 alternatif
 const images = [
   {
     id: 1,
@@ -58,8 +58,11 @@ const images = [
   },
 ];
 
+const screenWidth = Dimensions.get("window").width;
+const cellSize = screenWidth / 3 - 12;
+
 export default function App() {
-  // Simpan status masing-masing gambar: jumlah klik, versi gambar, skala
+  // Inisialisasi state per gambar (unik)
   const [imageStates, setImageStates] = useState(
     images.map(() => ({
       clickCount: 0,
@@ -68,34 +71,35 @@ export default function App() {
     }))
   );
 
-  // Menangani klik pada gambar
   const handlePress = (index: number) => {
-    setImageStates((prev) => {
-      const updated = [...prev];
-      const item = updated[index];
+    setImageStates((prevStates) => {
+      const updatedStates = [...prevStates];
+      const imageState = updatedStates[index];
 
-      if (item.clickCount >= 2) return updated; // Batasi maksimal 2 kali klik
+      if (imageState.clickCount >= 2) return prevStates;
 
-      item.clickCount += 1;
-      item.isAlt = true; // Gunakan gambar alternatif setelah klik pertama
+      const nextClick = imageState.clickCount + 1;
+      const nextScale = nextClick === 1 ? 1.2 : 2;
 
-      // Tentukan skala berdasarkan jumlah klik
-      const newScale = item.clickCount === 1 ? 1.2 : 2;
-
-      Animated.timing(item.scale, {
-        toValue: newScale,
+      Animated.timing(imageState.scale, {
+        toValue: nextScale,
         duration: 300,
         useNativeDriver: true,
       }).start();
 
-      return updated;
+      updatedStates[index] = {
+        ...imageState,
+        clickCount: nextClick,
+        isAlt: true,
+        scale: imageState.scale,
+      };
+
+      return updatedStates;
     });
   };
 
-  // Render satu gambar di grid
   const renderItem = ({ item, index }: any) => {
     const state = imageStates[index];
-
     return (
       <Pressable onPress={() => handlePress(index)} style={styles.cell}>
         <Animated.Image
@@ -117,8 +121,6 @@ export default function App() {
         scrollEnabled={false}
         contentContainerStyle={styles.grid}
       />
-
-      {/* Footer Identitas */}
       <View style={styles.footer}>
         <Text style={styles.name}>Muhammad Aditya Yudhistira</Text>
         <Text style={styles.nim}>105841114122</Text>
@@ -126,10 +128,6 @@ export default function App() {
     </View>
   );
 }
-
-// Hitung ukuran sel agar semua gambar punya ukuran sama & responsif
-const screenWidth = Dimensions.get("window").width;
-const cellSize = screenWidth / 3 - 12;
 
 const styles = StyleSheet.create({
   container: {
@@ -147,7 +145,7 @@ const styles = StyleSheet.create({
     height: cellSize,
     margin: 5,
     backgroundColor: "#fff",
-    borderRadius: 8,
+    borderRadius: 10,
     overflow: "hidden",
     justifyContent: "center",
     alignItems: "center",
