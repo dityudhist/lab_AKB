@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, Dimensions, Text } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Dimensions,
+  Text,
+} from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
 const imagePairs = [
@@ -41,14 +47,17 @@ const imagePairs = [
   },
 ];
 
+// Ukuran gambar responsif berdasarkan lebar layar
 const IMAGE_SIZE = Dimensions.get("window").width / 3 - 20;
 
+// Tipe state per gambar
 type ImageState = {
   clicks: number;
   isAlt: boolean;
 };
 
 export default function Index() {
+  // Inisialisasi state: tiap gambar menyimpan jumlah klik & status alt
   const [states, setStates] = useState<ImageState[]>(
     imagePairs.map(() => ({
       clicks: 0,
@@ -56,16 +65,17 @@ export default function Index() {
     }))
   );
 
+  // Fungsi saat gambar ditekan
   const handleImagePress = (index: number) => {
     setStates(prev =>
       prev.map((state, i) => {
         if (i !== index) return state;
-        if (state.clicks >= 2) return state; // Batasi maksimal 2 klik (maks skala 2.4)
+        if (state.clicks >= 2) return state; // Batas maksimum 2 klik
 
         return {
           ...state,
           clicks: state.clicks + 1,
-          isAlt: true,
+          isAlt: true, // Ubah ke gambar alternatif
         };
       })
     );
@@ -80,7 +90,7 @@ export default function Index() {
         return (
           <TouchableOpacity
             key={index}
-            activeOpacity={0.9}
+            activeOpacity={0.8}
             onPress={() => handleImagePress(index)}
             disabled={state.clicks >= 2}
             style={{ transform: [{ scale }], margin: 5 }}
@@ -89,10 +99,13 @@ export default function Index() {
               source={{ uri: state.isAlt ? pair.alt : pair.main }}
               style={styles.image}
               contentFit="cover"
-              onError={() => console.warn(`Gagal memuat gambar index ${index + 1}`)}
+              onError={() =>
+                console.warn(`⚠️ Gagal memuat gambar pada index ke-${index + 1}`)
+              }
             />
+            {/* Label jika sudah mencapai skala maksimum */}
             {state.clicks >= 2 && (
-              <Text style={styles.label}>Maksimum</Text>
+              <Text style={styles.label}>Maksimal</Text>
             )}
           </TouchableOpacity>
         );
@@ -101,6 +114,7 @@ export default function Index() {
   );
 }
 
+// Styling
 const styles = StyleSheet.create({
   container: {
     flexWrap: 'wrap',
