@@ -8,6 +8,7 @@ import {
   Text,
 } from "react-native";
 
+// Daftar gambar utama dan alternatif (9 pasang)
 const images = [
   { id: 1, main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg", alt: "https://i.pinimg.com/736x/9a/1e/db/9a1edb3a20db9a56dd8c7adc4a32ba6a.jpg" },
   { id: 2, main: "https://i.pinimg.com/736x/e5/b9/8a/e5b98aa4319968c4785b259a9ccdcb2e.jpg", alt: "https://i.pinimg.com/736x/92/39/c5/9239c5a50c50781c82dcf3006350fece.jpg" },
@@ -21,6 +22,7 @@ const images = [
 ];
 
 export default function App() {
+  // State awal: isAlt (ganti gambar), scale (animasi), clickCount (tracking)
   const [imageStates, setImageStates] = useState(
     images.map(() => ({
       isAlt: false,
@@ -29,32 +31,33 @@ export default function App() {
     }))
   );
 
+  // Fungsi saat gambar ditekan
   const handlePress = (index: number) => {
     const newStates = [...imageStates];
     const img = newStates[index];
 
-    if (img.clickCount === 0) {
+    // Ganti ke alternatif saat klik pertama
+    if (!img.isAlt) {
       img.isAlt = true;
-      img.clickCount += 1;
-
-      Animated.timing(img.scale, {
-        toValue: 1.2,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
-    } else if (img.clickCount === 1) {
-      img.clickCount += 1;
-
-      Animated.timing(img.scale, {
-        toValue: 2.0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
     }
 
-    setImageStates(newStates);
+    // Hitung skala baru per klik: naik 0.2, max 2.0
+    const currentScale = img.clickCount * 0.2 + 1;
+    if (currentScale < 2.0) {
+      const nextScale = Math.min(currentScale + 0.2, 2.0);
+      img.clickCount += 1;
+
+      Animated.timing(img.scale, {
+        toValue: nextScale,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+
+      setImageStates(newStates);
+    }
   };
 
+  // Render setiap item gambar
   const renderItem = ({
     item,
     index,
