@@ -70,23 +70,21 @@ export default function IndexPage() {
   const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
 
   const handlePress = (index: number) => {
-    const currentCount = clickCounts[index];
-    if (currentCount >= 2) return; // maksimal 2 kali klik (2 kenaikan skala)
+    if (clickCounts[index] >= 2) return; // Batas klik maksimum: 2 kali
 
-    const newCounts = [...clickCounts];
-    newCounts[index] += 1;
-    setClickCounts(newCounts);
+    const newClickCounts = [...clickCounts];
+    newClickCounts[index] += 1;
+    setClickCounts(newClickCounts);
 
-    // klik pertama → ganti ke alt
-    if (currentCount === 0) {
+    if (newClickCounts[index] === 1) {
       const newAlt = [...useAltImages];
       newAlt[index] = true;
       setUseAltImages(newAlt);
     }
   };
 
-  const getScale = (clickCount: number) => {
-    return 1 + clickCount * 1.2; // skala awal 1.0 → 1.2 → 2.4 (maks dua kali kenaikan)
+  const getScale = (clickCount: number): number => {
+    return 1 + clickCount * 1.2; // klik 0 => 1.0, klik 1 => 1.2, klik 2 => 2.4
   };
 
   return (
@@ -98,11 +96,15 @@ export default function IndexPage() {
         const scale = getScale(clickCounts[index]);
         return (
           <Pressable onPress={() => handlePress(index)}>
-            <View style={[styles.imageContainer, { transform: [{ scale }] }]}>
+            <View
+              style={[
+                styles.imageContainer,
+                { transform: [{ scale }] }, // Manual scaling
+              ]}
+            >
               <Image
                 source={{ uri: useAltImages[index] ? item.alt : item.main }}
                 style={styles.image}
-                resizeMode="cover"
               />
             </View>
           </Pressable>
