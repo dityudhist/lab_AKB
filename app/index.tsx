@@ -65,38 +65,39 @@ const images: ImageItem[] = [
 ];
 
 export default function IndexPage() {
-  const [clickCounts, setClickCounts] = useState(Array(images.length).fill(0));
-  const [useAltImages, setUseAltImages] = useState(Array(images.length).fill(false));
+  const [clickCounts, setClickCounts] = useState<number[]>(Array(images.length).fill(0));
+  const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
+  const [scaleValues, setScaleValues] = useState<number[]>(Array(images.length).fill(1));
   const [animatedScales] = useState(
     Array(images.length).fill(null).map(() => new Animated.Value(1))
   );
-  const [scaleValues, setScaleValues] = useState(Array(images.length).fill(1));
 
   const handlePress = (index: number) => {
-    if (clickCounts[index] >= 2) return;
+    if (clickCounts[index] >= 2) return; // Maksimal 2 klik
 
     const newClickCounts = [...clickCounts];
     newClickCounts[index]++;
     setClickCounts(newClickCounts);
 
-    const newAltImages = [...useAltImages];
+    const newUseAlt = [...useAltImages];
     if (newClickCounts[index] === 1) {
-      newAltImages[index] = true;
-      setUseAltImages(newAltImages);
+      newUseAlt[index] = true; // Ganti ke gambar alternatif
+      setUseAltImages(newUseAlt);
     }
 
-    // Hitung skala baru berdasarkan nilai state sebelumnya
-    const current = scaleValues[index];
-    let next = current * 1.2;
-    if (next > 2.0) next = 2.0;
+    // Hitung skala baru: naik 1.2x dari skala saat ini
+    const currentScale = scaleValues[index];
+    let nextScale = currentScale * 1.2;
+    if (nextScale > 2.0) nextScale = 2.0;
 
-    // Simpan nilai skala baru
-    const newScaleValues = [...scaleValues];
-    newScaleValues[index] = next;
-    setScaleValues(newScaleValues);
+    // Simpan skala baru ke state
+    const newScales = [...scaleValues];
+    newScales[index] = nextScale;
+    setScaleValues(newScales);
 
+    // Animasikan skalanya
     Animated.timing(animatedScales[index], {
-      toValue: next,
+      toValue: nextScale,
       duration: 300,
       useNativeDriver: true,
     }).start();
