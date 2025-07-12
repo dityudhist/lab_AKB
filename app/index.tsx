@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, Dimensions, Animated } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
 const imagePairs = [
@@ -55,11 +55,10 @@ export default function Index() {
     setStates((prevStates) =>
       prevStates.map((item, i) => {
         if (i === index) {
-          if (item.clickCount >= 2) return item;
-
+          if (item.clickCount >= 2) return item; // hanya boleh 2 klik
           return {
             clickCount: item.clickCount + 1,
-            isAlt: true, // Gambar berubah menjadi alternatif dan tetap
+            isAlt: true, // langsung permanen ke gambar alternatif
           };
         }
         return item;
@@ -71,9 +70,8 @@ export default function Index() {
     <View style={styles.container}>
       {imagePairs.map((pair, index) => {
         const { clickCount, isAlt } = states[index];
-
-        // Skala bertahap sesuai klik (klik ke-1 = 1.2, klik ke-2 = 2.4)
         let scale = 1;
+
         if (clickCount === 1) scale = 1.2;
         else if (clickCount === 2) scale = 2.4;
 
