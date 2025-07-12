@@ -60,42 +60,38 @@ const images: ImageItem[] = [
   {
     id: 9,
     main: "https://i.pinimg.com/736x/24/46/75/24467588c748f4fb716da446e43e5d62.jpg",
-    alt: "https://i.pinimg.com/736x/7c/36/85/7c36859aa49c9360c09e1214fb494199.jpg",
+    alt: "https://i.imgur.com/Z3KU4u7g.jpg",
   },
 ];
 
 export default function IndexPage() {
   const [clickCounts, setClickCounts] = useState<number[]>(Array(images.length).fill(0));
   const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
-  const [scaleValues, setScaleValues] = useState<number[]>(Array(images.length).fill(1));
-  const [animatedScales] = useState(
+  const [animatedScales] = useState(() =>
     Array(images.length).fill(null).map(() => new Animated.Value(1))
   );
 
   const handlePress = (index: number) => {
-    if (clickCounts[index] >= 2) return; // Maksimal 2 klik
+    if (clickCounts[index] >= 2) return;
 
     const newClickCounts = [...clickCounts];
     newClickCounts[index]++;
     setClickCounts(newClickCounts);
 
-    const newUseAlt = [...useAltImages];
+    const newUseAltImages = [...useAltImages];
     if (newClickCounts[index] === 1) {
-      newUseAlt[index] = true; // Ganti ke gambar alternatif
-      setUseAltImages(newUseAlt);
+      newUseAltImages[index] = true;
+      setUseAltImages(newUseAltImages);
     }
 
-    // Hitung skala baru: naik 1.2x dari skala saat ini
-    const currentScale = scaleValues[index];
-    let nextScale = currentScale * 1.2;
+    // Perhitungan skala berdasarkan jumlah klik
+    let nextScale = 1;
+    if (newClickCounts[index] === 1) nextScale = 1.2;
+    else if (newClickCounts[index] === 2) nextScale = 1.44;
+
+    // Maksimum tetap 2.0
     if (nextScale > 2.0) nextScale = 2.0;
 
-    // Simpan skala baru ke state
-    const newScales = [...scaleValues];
-    newScales[index] = nextScale;
-    setScaleValues(newScales);
-
-    // Animasikan skalanya
     Animated.timing(animatedScales[index], {
       toValue: nextScale,
       duration: 300,
