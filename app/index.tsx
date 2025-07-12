@@ -67,32 +67,27 @@ export default function App() {
   );
 
   const handlePress = (index: number) => {
-    setImageStates((prevStates) => {
-      const newStates = [...prevStates];
-      const item = newStates[index];
+    setImageStates((prev) => {
+      const updated = [...prev];
+      const item = updated[index];
 
-      if (item.clickCount >= 2) return newStates;
+      if (item.clickCount >= 2) return updated;
 
       item.clickCount += 1;
 
-      // Ubah gambar menjadi alternatif saat klik pertama
-      if (item.clickCount >= 1) item.isAlt = true;
-
-      let newScale = 1;
-
-      if (item.clickCount === 1) {
-        newScale = 1.2;
-      } else if (item.clickCount === 2) {
-        newScale = 1.2 * 2; // hasil dari klik pertama dikali 2 = 2.4
+      if (item.clickCount >= 1) {
+        item.isAlt = true;
       }
 
+      const scaleValue = item.clickCount === 1 ? 1.2 : 1.2 * 2; // 2.4
+
       Animated.timing(item.scale, {
-        toValue: newScale,
-        duration: 250,
+        toValue: scaleValue,
+        duration: 300,
         useNativeDriver: true,
       }).start();
 
-      return newStates;
+      return updated;
     });
   };
 
@@ -133,8 +128,8 @@ const cellSize = screenWidth / 3 - 12;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
-    backgroundColor: "#f4f4f4",
+    paddingTop: 50,
+    backgroundColor: "#f0f0f0",
     alignItems: "center",
   },
   grid: {
@@ -148,7 +143,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: 8,
     overflow: "hidden",
   },
   image: {
@@ -166,6 +161,6 @@ const styles = StyleSheet.create({
   },
   nim: {
     fontSize: 14,
-    color: "#555",
+    color: "#666",
   },
 });
