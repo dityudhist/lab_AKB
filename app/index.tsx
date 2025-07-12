@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
-// Pasangan gambar utama dan alternatif
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -42,11 +41,10 @@ const imagePairs = [
   },
 ];
 
-// Hitung ukuran gambar berdasarkan ukuran layar agar responsif
+// Ukuran gambar agar responsif
 const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
 
 export default function Index() {
-  // State array: untuk setiap gambar -> berapa kali diklik dan apakah pakai alternatif
   const [states, setStates] = useState(
     imagePairs.map(() => ({
       clickCount: 0,
@@ -54,20 +52,19 @@ export default function Index() {
     }))
   );
 
-  // Fungsi yang dipanggil saat gambar diklik
   const handleImageClick = (index: number) => {
     setStates((prevStates) =>
       prevStates.map((item, i) => {
         if (i === index) {
-          if (item.clickCount >= 2) {
-            return item; // Maksimal 2x klik
-          }
+          // Maksimal 2 klik
+          if (item.clickCount >= 2) return item;
+
           return {
             clickCount: item.clickCount + 1,
-            isAlt: !item.isAlt, // Toggle gambar alternatif
+            isAlt: !item.isAlt,
           };
         }
-        return item; // Gambar lain tidak berubah
+        return item;
       })
     );
   };
@@ -76,7 +73,10 @@ export default function Index() {
     <View style={styles.container}>
       {imagePairs.map((pair, index) => {
         const { clickCount, isAlt } = states[index];
-        const scale = Math.pow(1.2, clickCount); // 1.2^1 = 1.2, 1.2^2 = 1.44
+
+        // Skala: klik 0 = 1, klik 1 = 1.2, klik 2 = 2.4
+        const scale =
+          clickCount === 0 ? 1 : clickCount === 1 ? 1.2 : 2.4;
 
         return (
           <TouchableOpacity
@@ -97,7 +97,6 @@ export default function Index() {
   );
 }
 
-// Gaya
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
