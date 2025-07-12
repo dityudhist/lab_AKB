@@ -7,8 +7,10 @@ import {
   FlatList,
   Text,
   Image,
+  Dimensions,
 } from "react-native";
 
+// Array data gambar
 const images = [
   { id: 1, main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg", alt: "https://i.pinimg.com/736x/9a/1e/db/9a1edb3a20db9a56dd8c7adc4a32ba6a.jpg" },
   { id: 2, main: "https://i.pinimg.com/736x/e5/b9/8a/e5b98aa4319968c4785b259a9ccdcb2e.jpg", alt: "https://i.pinimg.com/736x/92/39/c5/9239c5a50c50781c82dcf3006350fece.jpg" },
@@ -21,7 +23,15 @@ const images = [
   { id: 9, main: "https://i.pinimg.com/736x/24/46/75/24467588c748f4fb716da446e43e5d62.jpg", alt: "https://i.pinimg.com/736x/7c/36/85/7c36859aa49c9360c09e1214fb494199.jpg" },
 ];
 
+// Menghitung ukuran sel agar responsif
+const { width } = Dimensions.get("window");
+const numColumns = 3;
+const marginSize = 5;
+const itemSize = (width - (marginSize * (numColumns + 1)) * 2) / numColumns;
+
+
 export default function App() {
+  // Inisialisasi state untuk setiap gambar
   const [imageStates, setImageStates] = useState(
     images.map(() => ({
       isAlt: false,
@@ -30,41 +40,61 @@ export default function App() {
     }))
   );
 
+  // Fungsi yang dijalankan saat gambar ditekan
   const handlePress = (index: number) => {
-    const newStates = [...imageStates];
-    const currentImage = newStates[index];
+    const currentState = imageStates[index];
 
-    if (currentImage.clickCount >= 2) return;
+    // Jika sudah diklik 2 kali, jangan lakukan apa-apa
+    if (currentState.clickCount >= 2) return;
 
-    if (!currentImage.isAlt) {
-      currentImage.isAlt = true;
-    }
+    // Tentukan skala berikutnya berdasarkan jumlah klik
+    const nextScale = currentState.clickCount === 0 ? 1.2 : 2.4;
 
-    const nextScale = currentImage.clickCount === 0 ? 1.2 : 2.4;
-    currentImage.clickCount += 1;
-
-    Animated.timing(currentImage.scale, {
+    // Jalankan animasi scaling
+    Animated.timing(currentState.scale, {
       toValue: nextScale,
-      duration: 200,
-      useNativeDriver: true,
+      duration: 300, // Durasi animasi sedikit diperlambat agar lebih halus
+      useNativeDriver: true, // Penting untuk performa
     }).start();
 
-    // Trigger re-render
-    setImageStates(newStates);
+    // --- BAGIAN YANG DIREVISI ---
+    // Perbarui state dengan cara immutable (membuat array baru)
+    setImageStates(currentStates =>
+      currentStates.map((state, i) => {
+        if (i === index) {
+          // Jika ini adalah gambar yang diklik, kembalikan objek state baru
+          return {
+            ...state,
+            isAlt: true, // Gambar selalu berubah ke alternatif dan tidak kembali
+            clickCount: state.clickCount + 1,
+          };
+        }
+        // Jika bukan, kembalikan state yang lama tanpa perubahan
+        return state;
+      })
+    );
   };
 
-  const renderItem = ({ item, index }: any) => {
+  // Fungsi untuk merender setiap item dalam FlatList
+  const renderItem = ({ item, index }: { item: typeof images[0], index: number }) => {
     const state = imageStates[index];
 
     return (
-      <Pressable onPress={() => handlePress(index)} style={styles.imageWrapper}>
-        <View style={styles.fixedSizeCell}>
-          <Animated.Image
-            source={{ uri: state.isAlt ? item.alt : item.main }}
-            style={[styles.image, { transform: [{ scale: state.scale }] }]}
-            resizeMode="cover"
-            onError={() => console.warn(`Gagal memuat gambar id: ${item.id}`)}
-          />
+      <Pressable onPress={() => handlePress(index)}>
+        <View style={styles.imageWrapper}>
+            <Animated.Image
+              source={{ uri: state.isAlt ? item.alt : item.main }}
+              style={[
+                styles.image,
+                {
+                  transform: [{ scale: state.scale }],
+                  // Z-index agar gambar yang membesar tampil di atas yang lain
+                  zIndex: state.clickCount > 0 ? 10 : 1,
+                },
+              ]}
+              resizeMode="cover"
+              onError={() => console.warn(`Gagal memuat gambar id: ${item.id}`)}
+            />
         </View>
       </Pressable>
     );
@@ -76,8 +106,10 @@ export default function App() {
         data={images}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        numColumns={3}
+        numColumns={numColumns}
         scrollEnabled={false}
+        // Menambahkan style untuk konten FlatList agar rapi
+        contentContainerStyle={styles.listContentContainer}
       />
       <View style={styles.footer}>
         <Text style={styles.name}>Muhammad Aditya Yudhistira</Text>
@@ -87,30 +119,36 @@ export default function App() {
   );
 }
 
+// Stylesheet untuk komponen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
-    alignItems: "center",
     backgroundColor: "#f5f5f5",
+    justifyContent: 'center', // Pusatkan konten secara vertikal
+  },
+  listContentContainer: {
+    alignItems: 'center', // Pusatkan grid di tengah layar
+    padding: marginSize,
   },
   imageWrapper: {
-    margin: 5,
-  },
-  fixedSizeCell: {
-    width: 100,
-    height: 100,
+    width: itemSize,
+    height: itemSize,
+    margin: marginSize,
+    // Menambahkan overflow: 'visible' agar scale tidak terpotong
+    overflow: 'visible',
     justifyContent: "center",
     alignItems: "center",
   },
   image: {
-    width: 100,
-    height: 100,
+    width: '50%',
+    height: '50%',
     borderRadius: 14,
   },
   footer: {
-    marginTop: 20,
+    paddingVertical: 20,
     alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
   },
   name: {
     fontSize: 18,
