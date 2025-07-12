@@ -5,7 +5,6 @@ import {
   Pressable,
   Animated,
   FlatList,
-  Dimensions,
   Text,
 } from "react-native";
 
@@ -34,19 +33,26 @@ export default function App() {
     const newStates = [...imageStates];
     const img = newStates[index];
 
-    if (img.clickCount < 2) {
+    if (img.clickCount === 0) {
       img.isAlt = true;
-      const newScale = Math.min(1 + (img.clickCount + 1) * 0.2, 2.0); // Maksimum scale 2.0
       img.clickCount += 1;
 
       Animated.timing(img.scale, {
-        toValue: newScale,
+        toValue: 1.2,
         duration: 200,
         useNativeDriver: true,
       }).start();
+    } else if (img.clickCount === 1) {
+      img.clickCount += 1;
 
-      setImageStates(newStates);
+      Animated.timing(img.scale, {
+        toValue: 2.0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
     }
+
+    setImageStates(newStates);
   };
 
   const renderItem = ({
