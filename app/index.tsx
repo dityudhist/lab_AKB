@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 
-// 9 gambar utama & 9 alternatif
+// 9 gambar utama dan alternatif
 const images = [
   {
     id: 1,
@@ -58,53 +58,70 @@ const images = [
   },
 ];
 
+// Ukuran sel dihitung dari lebar layar
 const screenWidth = Dimensions.get("window").width;
 const cellSize = screenWidth / 3 - 12;
 
 export default function App() {
-  // Inisialisasi state per gambar (unik)
   const [imageStates, setImageStates] = useState(
     images.map(() => ({
       clickCount: 0,
       isAlt: false,
       scale: new Animated.Value(1),
+      fallback: false,
     }))
   );
 
   const handlePress = (index: number) => {
-    setImageStates((prevStates) => {
-      const updatedStates = [...prevStates];
-      const imageState = updatedStates[index];
+    setImageStates((prev) => {
+      const updated = [...prev];
+      const item = updated[index];
 
-      if (imageState.clickCount >= 2) return prevStates;
+      if (item.clickCount >= 2) return prev; // batas maksimal 2 klik
 
-      const nextClick = imageState.clickCount + 1;
-      const nextScale = nextClick === 1 ? 1.2 : 2;
+      const nextClick = item.clickCount + 1;
+      const targetScale = nextClick === 1 ? 1.2 : 2;
+      const safeScale = Math.min(targetScale, 2); // batas aman 2x
 
-      Animated.timing(imageState.scale, {
-        toValue: nextScale,
+      Animated.timing(item.scale, {
+        toValue: safeScale,
         duration: 300,
         useNativeDriver: true,
       }).start();
 
-      updatedStates[index] = {
-        ...imageState,
+      updated[index] = {
+        ...item,
         clickCount: nextClick,
         isAlt: true,
-        scale: imageState.scale,
+        scale: item.scale,
       };
 
-      return updatedStates;
+      return updated;
+    });
+  };
+
+  const handleImageError = (index: number) => {
+    setImageStates((prev) => {
+      const updated = [...prev];
+      updated[index].fallback = true;
+      return updated;
     });
   };
 
   const renderItem = ({ item, index }: any) => {
     const state = imageStates[index];
+    const imageUrl = state.fallback
+      ? "https://via.placeholder.com/150?text=Image+Error"
+      : state.isAlt
+      ? item.alt
+      : item.main;
+
     return (
       <Pressable onPress={() => handlePress(index)} style={styles.cell}>
         <Animated.Image
-          source={{ uri: state.isAlt ? item.alt : item.main }}
+          source={{ uri: imageUrl }}
           style={[styles.image, { transform: [{ scale: state.scale }] }]}
+          onError={() => handleImageError(index)}
           resizeMode="cover"
         />
       </Pressable>
