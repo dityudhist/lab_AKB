@@ -9,8 +9,7 @@ import {
   Text,
 } from 'react-native';
 
-// Data gambar terpisah agar mudah diatur dan diimpor kembali jika perlu
-const imageData = [
+const initialImageData = [
   {
     id: 1,
     main: 'https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg',
@@ -60,23 +59,23 @@ const imageData = [
 
 export default function Index() {
   const [images, setImages] = useState(
-    imageData.map(img => ({
+    initialImageData.map(img => ({
       ...img,
-      scale: 1.0,
       isFlipped: false,
+      scale: 1,
       loading: true,
       error: false,
     }))
   );
 
-  const handleImagePress = (id: number) => {
+  const handlePress = (id: number) => {
     setImages(prev =>
       prev.map(image => {
         if (image.id === id) {
-          const nextScale = Math.min(image.scale + 1.2, 2);
+          const newScale = Math.min(image.scale + 1.2, 2.4);
           return {
             ...image,
-            scale: nextScale,
+            scale: newScale,
             isFlipped: true,
           };
         }
@@ -85,18 +84,16 @@ export default function Index() {
     );
   };
 
-  const handleImageLoadEnd = (id: number) => {
+  const handleLoadEnd = (id: number) => {
     setImages(prev =>
-      prev.map(image =>
-        image.id === id ? { ...image, loading: false } : image
-      )
+      prev.map(img => (img.id === id ? { ...img, loading: false } : img))
     );
   };
 
-  const handleImageError = (id: number) => {
+  const handleError = (id: number) => {
     setImages(prev =>
-      prev.map(image =>
-        image.id === id ? { ...image, error: true, loading: false } : image
+      prev.map(img =>
+        img.id === id ? { ...img, error: true, loading: false } : img
       )
     );
   };
@@ -107,15 +104,15 @@ export default function Index() {
         {images.map(image => (
           <TouchableOpacity
             key={image.id}
-            onPress={() => handleImagePress(image.id)}
-            disabled={image.scale >= 2}
+            onPress={() => handlePress(image.id)}
+            disabled={image.scale >= 2.4}
             style={styles.cell}
           >
             {image.loading && !image.error && (
-              <ActivityIndicator style={styles.loader} size="small" color="#888" />
+              <ActivityIndicator size="small" color="#888" />
             )}
             {image.error ? (
-              <View style={styles.errorContainer}>
+              <View style={styles.errorBox}>
                 <Text style={styles.errorText}>Load Failed</Text>
               </View>
             ) : (
@@ -126,8 +123,8 @@ export default function Index() {
                   { transform: [{ scale: image.scale }] },
                 ]}
                 resizeMode="cover"
-                onLoadEnd={() => handleImageLoadEnd(image.id)}
-                onError={() => handleImageError(image.id)}
+                onLoadEnd={() => handleLoadEnd(image.id)}
+                onError={() => handleError(image.id)}
               />
             )}
           </TouchableOpacity>
@@ -140,9 +137,9 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    paddingTop: 50,
-    backgroundColor: '#fefefe',
     alignItems: 'center',
+    paddingVertical: 40,
+    backgroundColor: '#fff',
   },
   grid: {
     flexDirection: 'row',
@@ -154,9 +151,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     margin: 5,
-    backgroundColor: '#eee',
+    backgroundColor: '#eaeaea',
     borderRadius: 8,
-    overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -165,16 +161,13 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 8,
   },
-  loader: {
-    position: 'absolute',
-    zIndex: 1,
-  },
-  errorContainer: {
+  errorBox: {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#ddd',
     width: '100%',
     height: '100%',
+    borderRadius: 8,
   },
   errorText: {
     color: '#444',
