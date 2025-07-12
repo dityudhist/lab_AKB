@@ -33,24 +33,28 @@ export default function App() {
     const newStates = [...imageStates];
     const img = newStates[index];
 
-    if (img.clickCount === 0) {
+    // Batasi hanya sampai 2 klik
+    if (img.clickCount >= 2) return;
+
+    if (!img.isAlt) {
       img.isAlt = true;
-      img.clickCount += 1;
-
-      Animated.timing(img.scale, {
-        toValue: 1.2,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
-    } else if (img.clickCount === 1) {
-      img.clickCount += 1;
-
-      Animated.timing(img.scale, {
-        toValue: 2.0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
     }
+
+    // Tentukan skala berdasarkan jumlah klik
+    let nextScale = 1;
+    if (img.clickCount === 0) {
+      nextScale = 1.2;
+    } else if (img.clickCount === 1) {
+      nextScale = 2.4;
+    }
+
+    img.clickCount += 1;
+
+    Animated.timing(img.scale, {
+      toValue: nextScale,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
 
     setImageStates(newStates);
   };
