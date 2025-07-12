@@ -70,22 +70,23 @@ export default function IndexPage() {
   const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
 
   const handlePress = (index: number) => {
-    const currentCount = clickCounts[index];
-    if (currentCount >= 2) return; // Maksimum 2 klik
+    const current = clickCounts[index];
+    if (current >= 2) return; // Maksimal 2 kali klik
 
-    const updatedClickCounts = [...clickCounts];
-    updatedClickCounts[index] += 1;
-    setClickCounts(updatedClickCounts);
+    const newCounts = [...clickCounts];
+    newCounts[index]++;
+    setClickCounts(newCounts);
 
-    if (updatedClickCounts[index] === 1) {
-      const updatedAltImages = [...useAltImages];
-      updatedAltImages[index] = true;
-      setUseAltImages(updatedAltImages);
+    // Klik pertama → ubah gambar ke alternatif
+    if (newCounts[index] === 1) {
+      const newAlts = [...useAltImages];
+      newAlts[index] = true;
+      setUseAltImages(newAlts);
     }
   };
 
   const getScale = (clickCount: number): number => {
-    return 1 + clickCount * 1.2; // 0 klik → 1.0x, 1 klik → 1.2x, 2 klik → 2.4x
+    return 1 + clickCount * 1.2; // Normal 1 → klik1: 1.2 → klik2: 2.4
   };
 
   return (
