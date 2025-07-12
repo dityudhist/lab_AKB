@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
-// 9 pasangan gambar utama dan alternatif
+// Pasangan gambar utama dan alternatif
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -42,15 +42,16 @@ const imagePairs = [
   },
 ];
 
-// Ukuran dinamis untuk grid 3x3
+// Ukuran gambar agar membentuk grid 3x3
 const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
 
 export default function Index() {
-  // State tiap gambar: clickCount & apakah alt image aktif
+  // State: setiap gambar punya skala, altStatus, dan flag selesai
   const [states, setStates] = useState(
     imagePairs.map(() => ({
-      clickCount: 0,
+      scale: 1.0,
       isAlt: false,
+      isMaxed: false,
     }))
   );
 
@@ -59,15 +60,16 @@ export default function Index() {
       prev.map((item, i) => {
         if (i !== index) return item;
 
-        const newClickCount = item.clickCount + 1;
-        const newScale = 1 + newClickCount * 1.2;
+        if (item.isMaxed) return item;
 
-        // Jika melebihi batas klik (2) atau skala (2.4), jangan ubah
-        if (newClickCount > 2 || newScale > 2.4) return item;
+        const nextScale = item.scale + 1.2;
+        const isFinal = nextScale >= 2.4;
 
         return {
-          clickCount: newClickCount,
-          isAlt: true, // aktifkan gambar alternatif setelah klik pertama
+          ...item,
+          scale: isFinal ? 2.4 : nextScale,
+          isAlt: true,
+          isMaxed: isFinal,
         };
       })
     );
@@ -76,16 +78,12 @@ export default function Index() {
   return (
     <View style={styles.container}>
       {imagePairs.map((pair, index) => {
-        const { clickCount, isAlt } = states[index];
-        const scale = 1 + clickCount * 1.2;
-        const isMaxed = scale >= 2.4;
+        const { scale, isAlt } = states[index];
 
         return (
           <TouchableOpacity
             key={index}
-            onPress={() => {
-              if (!isMaxed) handleImageClick(index);
-            }}
+            onPress={() => handleImageClick(index)}
             activeOpacity={0.9}
             style={{ transform: [{ scale }] }}
           >
@@ -103,9 +101,9 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: 10,
     padding: 16,
   },
