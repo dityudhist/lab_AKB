@@ -76,7 +76,7 @@ export default function App() {
       item.clickCount += 1;
       item.isAlt = true;
 
-      const newScale = item.clickCount === 1 ? 1.2 : 2.4;
+      const newScale = item.clickCount === 1 ? 1.2 : 2;
 
       Animated.timing(item.scale, {
         toValue: newScale,
