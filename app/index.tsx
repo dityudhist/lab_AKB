@@ -72,17 +72,15 @@ export default function IndexPage() {
   const handlePress = (index: number) => {
     const currentScale = scales[index];
 
-    // Klik pertama = 1.2, klik selanjutnya = +1.2 dari yang terakhir
-    let nextScale = currentScale === 1 ? 1.2 : currentScale + 1.2;
+    // Klik pertama: skala 1.2x
+    // Klik berikutnya: skala += 1.2, tetapi dibatasi max 2.0
+    const nextScale = Math.min(currentScale === 1 ? 1.2 : currentScale + 1.2, 2.0);
 
-    // Batas maksimum skala adalah 2.0
-    if (nextScale > 2.0) nextScale = 2.0;
-
-    // Ganti ke gambar alternatif jika belum
+    // Ganti gambar ke alternatif jika belum
     if (!useAltImages[index]) {
-      const updatedAlt = [...useAltImages];
-      updatedAlt[index] = true;
-      setUseAltImages(updatedAlt);
+      const updatedUseAlt = [...useAltImages];
+      updatedUseAlt[index] = true;
+      setUseAltImages(updatedUseAlt);
     }
 
     // Simpan skala baru
@@ -90,7 +88,7 @@ export default function IndexPage() {
     updatedScales[index] = nextScale;
     setScales(updatedScales);
 
-    // Jalankan animasi skala
+    // Jalankan animasi transform scale
     Animated.timing(animatedScales[index], {
       toValue: nextScale,
       duration: 300,
