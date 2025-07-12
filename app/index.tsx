@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
-// 9 gambar utama dan alternatif
+// 9 gambar utama dan 9 alternatif
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -42,25 +42,26 @@ const imagePairs = [
   },
 ];
 
-// Ukuran gambar responsif
+// Hitung ukuran gambar berdasarkan layar (agar muat 3 kolom)
 const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
 
 export default function Index() {
   const [states, setStates] = useState(
     imagePairs.map(() => ({
-      clickCount: 0,
-      isAlt: false,
+      clickCount: 0,  // jumlah klik
+      isAlt: false,   // apakah gambar alternatif sudah aktif
     }))
   );
 
   const handleImageClick = (index: number) => {
-    setStates(prev =>
-      prev.map((item, i) => {
-        if (i !== index) return item;
-        if (item.clickCount >= 2) return item; // maksimal 2 klik
+    setStates((prevStates) =>
+      prevStates.map((state, i) => {
+        if (i !== index) return state;
+        if (state.clickCount >= 2) return state; // maksimal 2 klik
+
         return {
-          clickCount: item.clickCount + 1,
-          isAlt: true, // ganti ke alternatif (permanen)
+          clickCount: state.clickCount + 1,
+          isAlt: true, // ganti ke gambar alternatif permanen setelah klik pertama
         };
       })
     );
@@ -71,8 +72,10 @@ export default function Index() {
       {imagePairs.map((pair, index) => {
         const { clickCount, isAlt } = states[index];
 
-        // Klik 0 = 1x, klik 1 = 1.2x, klik 2 = 2x
-        const scale = clickCount === 0 ? 1 : clickCount === 1 ? 1.2 : 2.0;
+        // Scale berdasarkan jumlah klik
+        const scale =
+          clickCount === 0 ? 1 :
+          clickCount === 1 ? 1.2 : 2.4;
 
         return (
           <TouchableOpacity
