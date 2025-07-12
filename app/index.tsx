@@ -80,7 +80,7 @@ export default function App() {
 
       let newScale = 1;
       if (nextClick === 1) newScale = 1.2;
-      else if (nextClick === 2) newScale = 2.0;
+      else if (nextClick === 2) newScale = 2.4;
 
       Animated.timing(item.scale, {
         toValue: newScale,
