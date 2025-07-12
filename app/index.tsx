@@ -9,7 +9,7 @@ import {
   Text,
 } from 'react-native';
 
-const initialImageData = [
+const initialImages = [
   {
     id: 1,
     main: 'https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg',
@@ -59,7 +59,7 @@ const initialImageData = [
 
 export default function Index() {
   const [images, setImages] = useState(
-    initialImageData.map(img => ({
+    initialImages.map(img => ({
       ...img,
       isFlipped: false,
       scale: 1,
@@ -72,7 +72,7 @@ export default function Index() {
     setImages(prev =>
       prev.map(image => {
         if (image.id === id) {
-          const newScale = Math.min(image.scale + 0.2, 2.4);
+          const newScale = Math.min(image.scale +0.2, 2);
           return {
             ...image,
             scale: newScale,
@@ -86,7 +86,9 @@ export default function Index() {
 
   const handleLoadEnd = (id: number) => {
     setImages(prev =>
-      prev.map(img => (img.id === id ? { ...img, loading: false } : img))
+      prev.map(img =>
+        img.id === id ? { ...img, loading: false } : img
+      )
     );
   };
 
@@ -105,11 +107,11 @@ export default function Index() {
           <TouchableOpacity
             key={image.id}
             onPress={() => handlePress(image.id)}
-            disabled={image.scale >= 2.4}
+            disabled={image.scale >= 2}
             style={styles.cell}
           >
             {image.loading && !image.error && (
-              <ActivityIndicator size="small" color="#888" />
+              <ActivityIndicator size="small" color="#555" />
             )}
             {image.error ? (
               <View style={styles.errorBox}>
@@ -138,7 +140,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: 50,
     backgroundColor: '#fff',
   },
   grid: {
@@ -151,7 +153,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     margin: 5,
-    backgroundColor: '#eaeaea',
+    backgroundColor: '#e0e0e0',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -164,13 +166,13 @@ const styles = StyleSheet.create({
   errorBox: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ddd',
+    backgroundColor: '#ccc',
     width: '100%',
     height: '100%',
     borderRadius: 8,
   },
   errorText: {
-    color: '#444',
+    color: '#333',
     fontSize: 12,
   },
 });
