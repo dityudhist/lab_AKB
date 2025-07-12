@@ -9,7 +9,6 @@ import {
   Dimensions,
 } from "react-native";
 
-// Daftar 9 gambar utama dan alternatif
 const images = [
   {
     id: 1,
@@ -72,16 +71,19 @@ export default function App() {
       const updatedStates = [...prevStates];
       const item = updatedStates[index];
 
+      // Maksimal 2 klik = tidak akan lanjut
       if (item.clickCount >= 2) return updatedStates;
 
-      const nextClick = item.clickCount + 1;
-      item.clickCount = nextClick;
+      // Ganti gambar jadi alternatif
       item.isAlt = true;
+      item.clickCount += 1;
 
+      // Hitung skala baru
       let newScale = 1;
-      if (nextClick === 1) newScale = 1.2;
-      else if (nextClick === 2) newScale = 2.4;
+      if (item.clickCount === 1) newScale = 1.2;
+      else if (item.clickCount === 2) newScale = 2.4;
 
+      // Eksekusi animasi skala
       Animated.timing(item.scale, {
         toValue: newScale,
         duration: 250,
@@ -123,7 +125,6 @@ export default function App() {
   );
 }
 
-// Dapatkan ukuran layar untuk memastikan proporsi sel seragam
 const screenWidth = Dimensions.get("window").width;
 const cellSize = screenWidth / 3 - 12;
 
