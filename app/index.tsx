@@ -74,7 +74,7 @@ export default function IndexPage() {
 
     // Klik pertama: skala 1.2x
     // Klik berikutnya: skala += 1.2, tetapi dibatasi max 2.0
-    const nextScale = Math.min(currentScale === 1 ? 1.2 : currentScale + 1.2);
+    const nextScale = Math.min(currentScale === 1 ? 1.2 : currentScale + 1.2, 2.4);
 
     // Ganti gambar ke alternatif jika belum
     if (!useAltImages[index]) {
