@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
-// 9 pasangan gambar utama dan alternatif
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -42,31 +41,26 @@ const imagePairs = [
   },
 ];
 
-// Ukuran untuk grid 3x3
 const IMAGE_SIZE = Dimensions.get("window").width / 3 - 20;
 
 export default function Index() {
   const [states, setStates] = useState(
     imagePairs.map(() => ({
       clicks: 0,
-      scale: 1.0,
       isAlt: false,
     }))
   );
 
   const handleImageClick = (index: number) => {
-    setStates(prevStates =>
-      prevStates.map((item, i) => {
+    setStates(prev =>
+      prev.map((item, i) => {
         if (i !== index) return item;
 
-        if (item.clicks >= 2) return item; // Batas 2 klik
+        if (item.clicks >= 2) return item;
 
         const nextClicks = item.clicks + 1;
-        const nextScale = 1 + nextClicks * 1.2;
-
         return {
           clicks: nextClicks,
-          scale: nextScale > 2.4 ? 2.4 : nextScale,
           isAlt: true,
         };
       })
@@ -76,7 +70,8 @@ export default function Index() {
   return (
     <View style={styles.container}>
       {imagePairs.map((pair, index) => {
-        const { scale, isAlt } = states[index];
+        const { clicks, isAlt } = states[index];
+        const scale = 1 + clicks * 1.2; // 0 klik = 1.0, 1 klik = 2.2, 2 klik = 2.4
 
         return (
           <TouchableOpacity
