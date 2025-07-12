@@ -73,27 +73,25 @@ export default function IndexPage() {
 
   const handlePress = (index: number) => {
     const currentScale = scales[index];
-
-    // Hitung skala berikutnya
     let nextScale = currentScale * 1.2;
+
     if (nextScale > 2.0) nextScale = 2.0;
 
-    // Perbarui gambar alternatif saat klik pertama
+    // Toggle gambar alternatif saat pertama kali diklik
     if (!useAltImages[index]) {
       const updatedAlt = [...useAltImages];
       updatedAlt[index] = true;
       setUseAltImages(updatedAlt);
     }
 
-    // Simpan nilai skala baru
+    // Simpan nilai skala
     const updatedScales = [...scales];
     updatedScales[index] = nextScale;
     setScales(updatedScales);
 
-    // Jalankan animasi
     Animated.timing(animatedScales[index], {
       toValue: nextScale,
-      duration: 300,
+      duration: 250,
       useNativeDriver: true,
     }).start();
   };
