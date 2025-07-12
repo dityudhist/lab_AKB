@@ -43,24 +43,28 @@ const imagePairs = [
 
 const IMAGE_SIZE = Dimensions.get("window").width / 3 - 20;
 
+type ImageState = {
+  clicks: number;
+  isAlt: boolean;
+};
+
 export default function Index() {
-  const [states, setStates] = useState(
+  const [states, setStates] = useState<ImageState[]>(
     imagePairs.map(() => ({
       clicks: 0,
       isAlt: false,
     }))
   );
 
-  const handleImageClick = (index: number) => {
+  const handleImagePress = (index: number) => {
     setStates(prev =>
-      prev.map((item, i) => {
-        if (i !== index) return item;
+      prev.map((state, i) => {
+        if (i !== index) return state;
+        if (state.clicks >= 2) return state;
 
-        if (item.clicks >= 2) return item;
-
-        const nextClicks = item.clicks + 1;
         return {
-          clicks: nextClicks,
+          ...state,
+          clicks: state.clicks + 1,
           isAlt: true,
         };
       })
@@ -70,18 +74,18 @@ export default function Index() {
   return (
     <View style={styles.container}>
       {imagePairs.map((pair, index) => {
-        const { clicks, isAlt } = states[index];
-        const scale = 1 + clicks * 1.2; // 0 klik = 1.0, 1 klik = 2.2, 2 klik = 2.4
+        const state = states[index];
+        const scale = 1 + state.clicks * 1.2;
 
         return (
           <TouchableOpacity
             key={index}
-            onPress={() => handleImageClick(index)}
             activeOpacity={0.9}
+            onPress={() => handleImagePress(index)}
             style={{ transform: [{ scale }] }}
           >
             <ExpoImage
-              source={{ uri: isAlt ? pair.alt : pair.main }}
+              source={{ uri: state.isAlt ? pair.alt : pair.main }}
               style={styles.image}
               contentFit="cover"
             />
@@ -94,9 +98,9 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    justifyContent: 'center',
     gap: 10,
     padding: 16,
   },
@@ -104,5 +108,6 @@ const styles = StyleSheet.create({
     width: IMAGE_SIZE,
     height: IMAGE_SIZE,
     borderRadius: 10,
+    backgroundColor: '#eee',
   },
 });
