@@ -70,21 +70,22 @@ export default function IndexPage() {
   const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
 
   const handlePress = (index: number) => {
-    if (clickCounts[index] >= 2) return; // Batas klik maksimum: 2 kali
+    const currentCount = clickCounts[index];
+    if (currentCount >= 2) return; // Maksimum 2 klik
 
-    const newClickCounts = [...clickCounts];
-    newClickCounts[index] += 1;
-    setClickCounts(newClickCounts);
+    const updatedClickCounts = [...clickCounts];
+    updatedClickCounts[index] += 1;
+    setClickCounts(updatedClickCounts);
 
-    if (newClickCounts[index] === 1) {
-      const newAlt = [...useAltImages];
-      newAlt[index] = true;
-      setUseAltImages(newAlt);
+    if (updatedClickCounts[index] === 1) {
+      const updatedAltImages = [...useAltImages];
+      updatedAltImages[index] = true;
+      setUseAltImages(updatedAltImages);
     }
   };
 
   const getScale = (clickCount: number): number => {
-    return 1 + clickCount * 1.2; // klik 0 => 1.0, klik 1 => 1.2, klik 2 => 2.4
+    return 1 + clickCount * 1.2; // 0 klik → 1.0x, 1 klik → 1.2x, 2 klik → 2.4x
   };
 
   return (
@@ -94,14 +95,10 @@ export default function IndexPage() {
       keyExtractor={(item) => item.id.toString()}
       renderItem={({ item, index }) => {
         const scale = getScale(clickCounts[index]);
+
         return (
           <Pressable onPress={() => handlePress(index)}>
-            <View
-              style={[
-                styles.imageContainer,
-                { transform: [{ scale }] }, // Manual scaling
-              ]}
-            >
+            <View style={[styles.imageContainer, { transform: [{ scale }] }]}>
               <Image
                 source={{ uri: useAltImages[index] ? item.alt : item.main }}
                 style={styles.image}
