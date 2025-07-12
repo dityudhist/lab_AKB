@@ -66,27 +66,27 @@ const images: ImageItem[] = [
 ];
 
 export default function IndexPage() {
-  const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
   const [clickCounts, setClickCounts] = useState<number[]>(Array(images.length).fill(0));
+  const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
 
   const handlePress = (index: number) => {
-    const newClickCounts = [...clickCounts];
-    if (newClickCounts[index] >= 2) return; // Maksimal 2 kali klik
-    newClickCounts[index]++;
-    setClickCounts(newClickCounts);
+    const currentCount = clickCounts[index];
+    if (currentCount >= 2) return; // maksimal 2 kali klik (2 kenaikan skala)
 
-    if (!useAltImages[index]) {
-      const newUseAltImages = [...useAltImages];
-      newUseAltImages[index] = true;
-      setUseAltImages(newUseAltImages);
+    const newCounts = [...clickCounts];
+    newCounts[index] += 1;
+    setClickCounts(newCounts);
+
+    // klik pertama → ganti ke alt
+    if (currentCount === 0) {
+      const newAlt = [...useAltImages];
+      newAlt[index] = true;
+      setUseAltImages(newAlt);
     }
   };
 
   const getScale = (clickCount: number) => {
-    if (clickCount === 0) return 1;
-    if (clickCount === 1) return 1.2;
-    if (clickCount === 2) return 2.0;
-    return 2.0; // Batas maksimum
+    return 1 + clickCount * 1.2; // skala awal 1.0 → 1.2 → 2.4 (maks dua kali kenaikan)
   };
 
   return (
@@ -98,12 +98,7 @@ export default function IndexPage() {
         const scale = getScale(clickCounts[index]);
         return (
           <Pressable onPress={() => handlePress(index)}>
-            <View
-              style={[
-                styles.imageContainer,
-                { transform: [{ scale }] },
-              ]}
-            >
+            <View style={[styles.imageContainer, { transform: [{ scale }] }]}>
               <Image
                 source={{ uri: useAltImages[index] ? item.alt : item.main }}
                 style={styles.image}
