@@ -70,27 +70,33 @@ export default function IndexPage() {
   const [animatedScales] = useState(
     Array(images.length).fill(null).map(() => new Animated.Value(1))
   );
+  const [scaleValues, setScaleValues] = useState(Array(images.length).fill(1));
 
   const handlePress = (index: number) => {
-    const counts = [...clickCounts];
-    if (counts[index] >= 2) return;
+    if (clickCounts[index] >= 2) return;
 
-    counts[index]++;
-    setClickCounts(counts);
+    const newClickCounts = [...clickCounts];
+    newClickCounts[index]++;
+    setClickCounts(newClickCounts);
 
-    const newAlt = [...useAltImages];
-    if (counts[index] === 1) {
-      newAlt[index] = true;
-      setUseAltImages(newAlt);
+    const newAltImages = [...useAltImages];
+    if (newClickCounts[index] === 1) {
+      newAltImages[index] = true;
+      setUseAltImages(newAltImages);
     }
 
-    // Ambil skala terakhir lalu naikkan 1.2x, maksimal 2.0x
-    const currentScale = animatedScales[index]._value || 1;
-    let nextScale = currentScale * 1.2;
-    if (nextScale > 2.0) nextScale = 2.0;
+    // Hitung skala baru berdasarkan nilai state sebelumnya
+    const current = scaleValues[index];
+    let next = current * 1.2;
+    if (next > 2.0) next = 2.0;
+
+    // Simpan nilai skala baru
+    const newScaleValues = [...scaleValues];
+    newScaleValues[index] = next;
+    setScaleValues(newScaleValues);
 
     Animated.timing(animatedScales[index], {
-      toValue: nextScale,
+      toValue: next,
       duration: 300,
       useNativeDriver: true,
     }).start();
