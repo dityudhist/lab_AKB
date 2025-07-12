@@ -9,6 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 
+// Data: 9 gambar utama dan 9 gambar alternatif
 const images = [
   {
     id: 1,
@@ -58,6 +59,7 @@ const images = [
 ];
 
 export default function App() {
+  // Simpan status masing-masing gambar: jumlah klik, versi gambar, skala
   const [imageStates, setImageStates] = useState(
     images.map(() => ({
       clickCount: 0,
@@ -66,20 +68,22 @@ export default function App() {
     }))
   );
 
+  // Menangani klik pada gambar
   const handlePress = (index: number) => {
     setImageStates((prev) => {
       const updated = [...prev];
       const item = updated[index];
 
-      if (item.clickCount >= 2) return updated;
+      if (item.clickCount >= 2) return updated; // Batasi maksimal 2 kali klik
 
       item.clickCount += 1;
-      item.isAlt = true;
+      item.isAlt = true; // Gunakan gambar alternatif setelah klik pertama
 
-      const scaleValue = item.clickCount === 1 ? 1.2 : 2;
+      // Tentukan skala berdasarkan jumlah klik
+      const newScale = item.clickCount === 1 ? 1.2 : 2;
 
       Animated.timing(item.scale, {
-        toValue: scaleValue,
+        toValue: newScale,
         duration: 300,
         useNativeDriver: true,
       }).start();
@@ -88,8 +92,10 @@ export default function App() {
     });
   };
 
+  // Render satu gambar di grid
   const renderItem = ({ item, index }: any) => {
     const state = imageStates[index];
+
     return (
       <Pressable onPress={() => handlePress(index)} style={styles.cell}>
         <Animated.Image
@@ -111,6 +117,8 @@ export default function App() {
         scrollEnabled={false}
         contentContainerStyle={styles.grid}
       />
+
+      {/* Footer Identitas */}
       <View style={styles.footer}>
         <Text style={styles.name}>Muhammad Aditya Yudhistira</Text>
         <Text style={styles.nim}>105841114122</Text>
@@ -119,6 +127,7 @@ export default function App() {
   );
 }
 
+// Hitung ukuran sel agar semua gambar punya ukuran sama & responsif
 const screenWidth = Dimensions.get("window").width;
 const cellSize = screenWidth / 3 - 12;
 
@@ -137,11 +146,11 @@ const styles = StyleSheet.create({
     width: cellSize,
     height: cellSize,
     margin: 5,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#fff",
     borderRadius: 8,
     overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
   },
   image: {
     width: "100%",
