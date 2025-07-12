@@ -41,7 +41,6 @@ const imagePairs = [
   },
 ];
 
-// Lebar 1 gambar (grid 3 kolom)
 const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
 
 export default function Index() {
@@ -56,10 +55,12 @@ export default function Index() {
     setStates((prevStates) =>
       prevStates.map((item, i) =>
         i === index
-          ? {
-              clickCount: Math.min(item.clickCount + 1, 2),
-              isAlt: !item.isAlt,
-            }
+          ? item.clickCount < 2
+            ? {
+                clickCount: item.clickCount + 1,
+                isAlt: !item.isAlt,
+              }
+            : item
           : item
       )
     );
@@ -69,7 +70,7 @@ export default function Index() {
     <View style={styles.container}>
       {imagePairs.map((image, index) => {
         const { isAlt, clickCount } = states[index];
-        const scale = Math.pow(1.2, clickCount); // 1.2x setiap klik, maksimal 1.44
+        const scale = Math.pow(1.2, clickCount);
 
         return (
           <TouchableOpacity
