@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   StyleSheet,
@@ -6,11 +6,11 @@ import {
   Animated,
   FlatList,
   Text,
-  Image,
   Dimensions,
 } from "react-native";
 
-// Array data gambar
+// --- DATA GAMBAR ---
+// Array yang berisi 9 pasang gambar (utama dan alternatif)
 const images = [
   { id: 1, main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg", alt: "https://i.pinimg.com/736x/9a/1e/db/9a1edb3a20db9a56dd8c7adc4a32ba6a.jpg" },
   { id: 2, main: "https://i.pinimg.com/736x/e5/b9/8a/e5b98aa4319968c4785b259a9ccdcb2e.jpg", alt: "https://i.pinimg.com/736x/92/39/c5/9239c5a50c50781c82dcf3006350fece.jpg" },
@@ -23,78 +23,82 @@ const images = [
   { id: 9, main: "https://i.pinimg.com/736x/24/46/75/24467588c748f4fb716da446e43e5d62.jpg", alt: "https://i.pinimg.com/736x/7c/36/85/7c36859aa49c9360c09e1214fb494199.jpg" },
 ];
 
-// Menghitung ukuran sel agar responsif
+// --- PENGATURAN RESPONSIVE ---
+// Menghitung ukuran sel gambar agar pas di layar
 const { width } = Dimensions.get("window");
 const numColumns = 3;
-const marginSize = 5;
-const itemSize = (width - (marginSize * (numColumns + 1)) * 2) / numColumns;
-
+const marginSize = 8; // Memberi sedikit ruang antar gambar
+const itemSize = (width - marginSize * (numColumns * 2)) / numColumns;
 
 export default function App() {
-  // Inisialisasi state untuk setiap gambar
-  const [imageStates, setImageStates] = useState(
+  // --- STATE MANAGEMENT ---
+  // Inisialisasi state untuk setiap gambar.
+  // Menggunakan useRef agar Animated.Value tidak dibuat ulang setiap render.
+  const imageStates = useRef(
     images.map(() => ({
       isAlt: false,
       scale: new Animated.Value(1),
       clickCount: 0,
     }))
-  );
+  ).current;
 
-  // Fungsi yang dijalankan saat gambar ditekan
+  // State untuk memicu re-render setelah state di useRef berubah
+  const [_, setForceRender] = useState(0);
+
+  // --- LOGIKA UTAMA ---
+  // Fungsi ini dijalankan setiap kali sebuah gambar ditekan.
   const handlePress = (index: number) => {
-    const currentState = imageStates[index];
+    const imageToUpdate = imageStates[index];
 
-    // Jika sudah diklik 2 kali, jangan lakukan apa-apa
-    if (currentState.clickCount >= 2) return;
+    // 1. Batasan Penskalaan Maksimum: Jika sudah diklik 2x, hentikan.
+    if (imageToUpdate.clickCount >= 2) {
+      return;
+    }
 
-    // Tentukan skala berikutnya berdasarkan jumlah klik
-    const nextScale = currentState.clickCount === 0 ? 1.2 : 2.4;
+    // 2. Penskalaan Bertahap: Tentukan skala berikutnya.
+    // Klik pertama -> 1.2, Klik kedua -> 2.4
+    const nextScale = imageToUpdate.clickCount === 0 ? 1.2 : 2.4;
 
-    // Jalankan animasi scaling
-    Animated.timing(currentState.scale, {
+    // 3. Jalankan Animasi Penskalaan
+    Animated.timing(imageToUpdate.scale, {
       toValue: nextScale,
-      duration: 300, // Durasi animasi sedikit diperlambat agar lebih halus
-      useNativeDriver: true, // Penting untuk performa
+      duration: 300,
+      useNativeDriver: true, // Penting untuk performa animasi yang mulus
     }).start();
 
-    // --- BAGIAN YANG DIREVISI ---
-    // Perbarui state dengan cara immutable (membuat array baru)
-    setImageStates(currentStates =>
-      currentStates.map((state, i) => {
-        if (i === index) {
-          // Jika ini adalah gambar yang diklik, kembalikan objek state baru
-          return {
-            ...state,
-            isAlt: true, // Gambar selalu berubah ke alternatif dan tidak kembali
-            clickCount: state.clickCount + 1,
-          };
-        }
-        // Jika bukan, kembalikan state yang lama tanpa perubahan
-        return state;
-      })
-    );
+    // 4. Penggantian Gambar & Update State
+    // Tandai gambar untuk diubah ke versi alternatifnya
+    imageToUpdate.isAlt = true;
+    // Tambah jumlah klik
+    imageToUpdate.clickCount += 1;
+
+    // Paksa komponen untuk re-render agar perubahan gambar (isAlt) terlihat
+    setForceRender(val => val + 1);
   };
 
+  // --- RENDER KOMPONEN ---
   // Fungsi untuk merender setiap item dalam FlatList
   const renderItem = ({ item, index }: { item: typeof images[0], index: number }) => {
     const state = imageStates[index];
 
     return (
       <Pressable onPress={() => handlePress(index)}>
+        {/* Wrapper ini penting agar 'scale' tidak terpotong */}
         <View style={styles.imageWrapper}>
-            <Animated.Image
-              source={{ uri: state.isAlt ? item.alt : item.main }}
-              style={[
-                styles.image,
-                {
-                  transform: [{ scale: state.scale }],
-                  // Z-index agar gambar yang membesar tampil di atas yang lain
-                  zIndex: state.clickCount > 0 ? 10 : 1,
-                },
-              ]}
-              resizeMode="cover"
-              onError={() => console.warn(`Gagal memuat gambar id: ${item.id}`)}
-            />
+          <Animated.Image
+            // Pilih gambar 'alt' jika isAlt true, jika tidak tampilkan 'main'
+            source={{ uri: state.isAlt ? item.alt : item.main }}
+            style={[
+              styles.image,
+              {
+                // Terapkan animasi skala dari state
+                transform: [{ scale: state.scale }],
+                // zIndex memastikan gambar yang membesar tampil di atas yang lain
+                zIndex: state.clickCount > 0 ? 10 : 1,
+              },
+            ]}
+            resizeMode="cover"
+          />
         </View>
       </Pressable>
     );
@@ -108,7 +112,6 @@ export default function App() {
         keyExtractor={(item) => item.id.toString()}
         numColumns={numColumns}
         scrollEnabled={false}
-        // Menambahkan style untuk konten FlatList agar rapi
         contentContainerStyle={styles.listContentContainer}
       />
       <View style={styles.footer}>
@@ -119,36 +122,39 @@ export default function App() {
   );
 }
 
-// Stylesheet untuk komponen
+// --- STYLESHEET ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
-    justifyContent: 'center', // Pusatkan konten secara vertikal
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
   },
   listContentContainer: {
-    alignItems: 'center', // Pusatkan grid di tengah layar
+    alignItems: "center",
+    justifyContent: "center",
     padding: marginSize,
   },
   imageWrapper: {
     width: itemSize,
     height: itemSize,
     margin: marginSize,
-    // Menambahkan overflow: 'visible' agar scale tidak terpotong
-    overflow: 'visible',
+    // Gaya ini penting agar gambar yang membesar tidak terpotong oleh batas view
+    overflow: "visible",
     justifyContent: "center",
     alignItems: "center",
   },
   image: {
-    width: '50%',
-    height: '50%',
-    borderRadius: 14,
+    width: "100%",
+    height: "100%",
+    borderRadius: 12,
+    backgroundColor: '#ccc' // Warna placeholder jika gambar lambat dimuat
   },
   footer: {
     paddingVertical: 20,
     alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: "#e0e0e0",
+    backgroundColor: '#fff',
   },
   name: {
     fontSize: 18,
