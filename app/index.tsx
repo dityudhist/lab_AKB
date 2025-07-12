@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
-// Array pasangan gambar: 9 gambar utama dan 9 alternatif
+// 9 gambar utama dan 9 alternatif
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -42,30 +42,27 @@ const imagePairs = [
   },
 ];
 
-// Menghitung ukuran sel gambar agar proporsional (3 kolom)
+// Hitung ukuran gambar berdasarkan layar (agar muat 3 kolom)
 const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
 
 export default function Index() {
-  // Menyimpan status untuk setiap gambar: berapa kali diklik & apakah gambar sudah berubah ke alternatif
   const [states, setStates] = useState(
     imagePairs.map(() => ({
-      clickCount: 0,
-      isAlt: false,
+      clickCount: 0,  // jumlah klik
+      isAlt: false,   // apakah gambar alternatif sudah aktif
     }))
   );
 
-  // Fungsi menangani klik pada gambar
   const handleImageClick = (index: number) => {
     setStates((prevStates) =>
-      prevStates.map((item, i) => {
-        if (i === index) {
-          if (item.clickCount >= 2) return item; // Maksimum 2 klik
-          return {
-            clickCount: item.clickCount + 1,
-            isAlt: true, // Ganti ke alternatif dan tetap di sana
-          };
-        }
-        return item;
+      prevStates.map((state, i) => {
+        if (i !== index) return state;
+        if (state.clickCount >= 2) return state; // maksimal 2 klik
+
+        return {
+          clickCount: state.clickCount + 1,
+          isAlt: true, // ganti ke gambar alternatif permanen setelah klik pertama
+        };
       })
     );
   };
@@ -75,16 +72,16 @@ export default function Index() {
       {imagePairs.map((pair, index) => {
         const { clickCount, isAlt } = states[index];
 
-        // Hitung nilai skala berdasarkan jumlah klik
-        let scale = 1;
-        if (clickCount === 1) scale = 1.2;
-        else if (clickCount === 2) scale = 2.4;
+        // Scale berdasarkan jumlah klik
+        const scale =
+          clickCount === 0 ? 1 :
+          clickCount === 1 ? 1.2 : 2.4;
 
         return (
           <TouchableOpacity
             key={index}
             onPress={() => handleImageClick(index)}
-            activeOpacity={0.8}
+            activeOpacity={0.9}
             style={{ transform: [{ scale }] }}
           >
             <ExpoImage
@@ -105,7 +102,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     gap: 10,
-    paddingVertical: 30,
+    paddingVertical: 20,
   },
   image: {
     width: IMAGE_SIZE,
