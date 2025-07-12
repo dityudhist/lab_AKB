@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
+// Pasangan gambar utama dan alternatif
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -41,9 +42,11 @@ const imagePairs = [
   },
 ];
 
+// Hitung ukuran gambar berdasarkan ukuran layar agar responsif
 const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
 
 export default function Index() {
+  // State array: untuk setiap gambar -> berapa kali diklik dan apakah pakai alternatif
   const [states, setStates] = useState(
     imagePairs.map(() => ({
       clickCount: 0,
@@ -51,26 +54,29 @@ export default function Index() {
     }))
   );
 
+  // Fungsi yang dipanggil saat gambar diklik
   const handleImageClick = (index: number) => {
     setStates((prevStates) =>
-      prevStates.map((item, i) =>
-        i === index
-          ? item.clickCount < 2
-            ? {
-                clickCount: item.clickCount + 1,
-                isAlt: !item.isAlt,
-              }
-            : item
-          : item
-      )
+      prevStates.map((item, i) => {
+        if (i === index) {
+          if (item.clickCount >= 2) {
+            return item; // Maksimal 2x klik
+          }
+          return {
+            clickCount: item.clickCount + 1,
+            isAlt: !item.isAlt, // Toggle gambar alternatif
+          };
+        }
+        return item; // Gambar lain tidak berubah
+      })
     );
   };
 
   return (
     <View style={styles.container}>
-      {imagePairs.map((image, index) => {
-        const { isAlt, clickCount } = states[index];
-        const scale = Math.pow(1.2, clickCount);
+      {imagePairs.map((pair, index) => {
+        const { clickCount, isAlt } = states[index];
+        const scale = Math.pow(1.2, clickCount); // 1.2^1 = 1.2, 1.2^2 = 1.44
 
         return (
           <TouchableOpacity
@@ -80,7 +86,7 @@ export default function Index() {
             style={{ transform: [{ scale }] }}
           >
             <ExpoImage
-              source={{ uri: isAlt ? image.alt : image.main }}
+              source={{ uri: isAlt ? pair.alt : pair.main }}
               style={styles.image}
               contentFit="cover"
             />
@@ -91,6 +97,7 @@ export default function Index() {
   );
 }
 
+// Gaya
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
@@ -102,6 +109,6 @@ const styles = StyleSheet.create({
   image: {
     width: IMAGE_SIZE,
     height: IMAGE_SIZE,
-    borderRadius: 8,
+    borderRadius: 10,
   },
 });
