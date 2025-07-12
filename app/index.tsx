@@ -80,10 +80,10 @@ export default function Index() {
         const scale =
           clickCount === 0 ? 1 :
           clickCount === 1 ? 1.2 :
-          clickCount === 2 ? 2.0 : 2.0;
+          clickCount === 2 ? 2.4 : 2.4;
 
         // Jika sudah lebih dari 2x, nonaktifkan klik
-        const disableClick = scale >= 2.0;
+        const disableClick = scale >= 2.4;
 
         return (
           <TouchableOpacity
