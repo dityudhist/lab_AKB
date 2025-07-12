@@ -6,9 +6,10 @@ import {
   Animated,
   FlatList,
   Text,
-  Image,
+  Dimensions,
 } from "react-native";
 
+// Daftar 9 gambar utama dan alternatif
 const images = [
   {
     id: 1,
@@ -67,34 +68,36 @@ export default function App() {
   );
 
   const handlePress = (index: number) => {
-    setImageStates((prev) => {
-      const updated = [...prev];
-      const item = updated[index];
+    setImageStates((prevStates) => {
+      const updatedStates = [...prevStates];
+      const item = updatedStates[index];
 
-      if (item.clickCount >= 2) return updated;
+      if (item.clickCount >= 2) return updatedStates;
 
-      item.clickCount += 1;
+      const nextClick = item.clickCount + 1;
+      item.clickCount = nextClick;
       item.isAlt = true;
 
-      const newScale = item.clickCount === 1 ? 1.2 : 2;
+      let newScale = 1;
+      if (nextClick === 1) newScale = 1.2;
+      else if (nextClick === 2) newScale = 2.4;
 
       Animated.timing(item.scale, {
         toValue: newScale,
-        duration: 300,
+        duration: 250,
         useNativeDriver: true,
       }).start();
 
-      return updated;
+      return updatedStates;
     });
   };
 
   const renderItem = ({ item, index }: any) => {
     const state = imageStates[index];
-
     return (
       <Pressable onPress={() => handlePress(index)} style={styles.cell}>
         <Animated.Image
-          source={{ uri: state?.isAlt ? item.alt : item.main }}
+          source={{ uri: state.isAlt ? item.alt : item.main }}
           style={[styles.image, { transform: [{ scale: state.scale }] }]}
           resizeMode="cover"
         />
@@ -120,30 +123,34 @@ export default function App() {
   );
 }
 
+// Dapatkan ukuran layar untuk memastikan proporsi sel seragam
+const screenWidth = Dimensions.get("window").width;
+const cellSize = screenWidth / 3 - 12;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f2f2f2",
     paddingTop: 40,
+    backgroundColor: "#f4f4f4",
     alignItems: "center",
   },
   grid: {
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
   },
   cell: {
-    width: 100,
-    height: 100,
+    width: cellSize,
+    height: cellSize,
     margin: 5,
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#fff",
     borderRadius: 10,
     overflow: "hidden",
-    justifyContent: "center",
-    alignItems: "center",
   },
   image: {
-    width: 100,
-    height: 100,
+    width: "100%",
+    height: "100%",
   },
   footer: {
     marginTop: 20,
@@ -152,6 +159,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#333",
   },
   nim: {
     fontSize: 14,
