@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
-// Daftar gambar utama dan alternatif
+// 9 pasangan gambar utama dan alternatif
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -42,11 +42,11 @@ const imagePairs = [
   },
 ];
 
-// Hitung ukuran tiap gambar agar membentuk grid 3x3
-const IMAGE_SIZE = Dimensions.get("window").width / 3 - 20;
+// Ukuran dinamis untuk grid 3x3
+const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
 
 export default function Index() {
-  // State per gambar: clickCount dan apakah sudah jadi gambar alternatif
+  // State tiap gambar: clickCount & apakah alt image aktif
   const [states, setStates] = useState(
     imagePairs.map(() => ({
       clickCount: 0,
@@ -55,14 +55,14 @@ export default function Index() {
   );
 
   const handleImageClick = (index: number) => {
-    setStates((prevStates) =>
-      prevStates.map((item, i) => {
+    setStates(prev =>
+      prev.map((item, i) => {
         if (i !== index) return item;
 
         const newClickCount = item.clickCount + 1;
         const newScale = 1 + newClickCount * 1.2;
 
-        // Batasi jika sudah lebih dari 2 klik (maksimum skala 2.4)
+        // Jika melebihi batas klik (2) atau skala (2.4), jangan ubah
         if (newClickCount > 2 || newScale > 2.4) return item;
 
         return {
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "center",
     gap: 10,
-    paddingVertical: 20,
+    padding: 16,
   },
   image: {
     width: IMAGE_SIZE,
