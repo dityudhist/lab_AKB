@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, Animated, Dimensions } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
 const imagePairs = [
@@ -41,42 +41,48 @@ const imagePairs = [
   },
 ];
 
+// Lebar 1 gambar (grid 3 kolom)
+const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
+
 export default function Index() {
   const [states, setStates] = useState(
     imagePairs.map(() => ({
-      clicked: 0,
-      showAlt: false,
+      clickCount: 0,
+      isAlt: false,
     }))
   );
 
-  const handleClick = (index: number) => {
+  const handleImageClick = (index: number) => {
     setStates((prevStates) =>
-      prevStates.map((state, i) =>
+      prevStates.map((item, i) =>
         i === index
           ? {
-              clicked: Math.min(state.clicked + 1, 2), // Maksimal klik 2
-              showAlt: !state.showAlt,
+              clickCount: Math.min(item.clickCount + 1, 2),
+              isAlt: !item.isAlt,
             }
-          : state
+          : item
       )
     );
   };
 
   return (
     <View style={styles.container}>
-      {imagePairs.map((pair, index) => {
-        const state = states[index];
-        const scale = 1.2 ** state.clicked;
+      {imagePairs.map((image, index) => {
+        const { isAlt, clickCount } = states[index];
+        const scale = Math.pow(1.2, clickCount); // 1.2x setiap klik, maksimal 1.44
 
         return (
-          <TouchableOpacity key={index} onPress={() => handleClick(index)}>
-            <Animated.View style={{ transform: [{ scale }] }}>
-              <ExpoImage
-                source={{ uri: state.showAlt ? pair.alt : pair.main }}
-                style={styles.image}
-                contentFit="cover"
-              />
-            </Animated.View>
+          <TouchableOpacity
+            key={index}
+            onPress={() => handleImageClick(index)}
+            activeOpacity={0.8}
+            style={{ transform: [{ scale }] }}
+          >
+            <ExpoImage
+              source={{ uri: isAlt ? image.alt : image.main }}
+              style={styles.image}
+              contentFit="cover"
+            />
           </TouchableOpacity>
         );
       })}
@@ -89,12 +95,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    paddingVertical: 40,
     gap: 10,
+    paddingVertical: 30,
   },
   image: {
-    width: Dimensions.get('window').width / 3.3,
-    height: Dimensions.get('window').width / 3.3,
-    borderRadius: 10,
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    borderRadius: 8,
   },
 });
