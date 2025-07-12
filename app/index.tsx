@@ -6,8 +6,10 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Text,
 } from 'react-native';
 
+// Data gambar terpisah agar mudah diatur dan diimpor kembali jika perlu
 const imageData = [
   {
     id: 1,
@@ -58,43 +60,43 @@ const imageData = [
 
 export default function Index() {
   const [images, setImages] = useState(
-    imageData.map(item => ({
-      ...item,
+    imageData.map(img => ({
+      ...img,
       scale: 1.0,
-      isAlt: false,
+      isFlipped: false,
       loading: true,
       error: false,
     }))
   );
 
-  const handlePress = (id: number) => {
+  const handleImagePress = (id: number) => {
     setImages(prev =>
-      prev.map(img => {
-        if (img.id === id && img.scale < 2.4) {
-          const nextScale = Math.min(img.scale + 1.2, 2.4);
+      prev.map(image => {
+        if (image.id === id) {
+          const nextScale = Math.min(image.scale + 1.2, 2);
           return {
-            ...img,
+            ...image,
             scale: nextScale,
-            isAlt: true,
+            isFlipped: true,
           };
         }
-        return img;
+        return image;
       })
     );
   };
 
-  const handleLoadEnd = (id: number) => {
+  const handleImageLoadEnd = (id: number) => {
     setImages(prev =>
-      prev.map(img =>
-        img.id === id ? { ...img, loading: false } : img
+      prev.map(image =>
+        image.id === id ? { ...image, loading: false } : image
       )
     );
   };
 
-  const handleError = (id: number) => {
+  const handleImageError = (id: number) => {
     setImages(prev =>
-      prev.map(img =>
-        img.id === id ? { ...img, error: true, loading: false } : img
+      prev.map(image =>
+        image.id === id ? { ...image, error: true, loading: false } : image
       )
     );
   };
@@ -105,33 +107,27 @@ export default function Index() {
         {images.map(image => (
           <TouchableOpacity
             key={image.id}
-            onPress={() => handlePress(image.id)}
-            disabled={image.scale >= 2.4}
+            onPress={() => handleImagePress(image.id)}
+            disabled={image.scale >= 2}
             style={styles.cell}
           >
             {image.loading && !image.error && (
-              <ActivityIndicator style={styles.loader} color="#999" size="small" />
+              <ActivityIndicator style={styles.loader} size="small" color="#888" />
             )}
             {image.error ? (
-              <View style={styles.errorBox}>
-                <Image
-                  source={{
-                    uri: "https://via.placeholder.com/100x100?text=Error",
-                  }}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>Load Failed</Text>
               </View>
             ) : (
               <Image
-                source={{ uri: image.isAlt ? image.alt : image.main }}
-                onLoadEnd={() => handleLoadEnd(image.id)}
-                onError={() => handleError(image.id)}
+                source={{ uri: image.isFlipped ? image.alt : image.main }}
                 style={[
                   styles.image,
                   { transform: [{ scale: image.scale }] },
                 ]}
                 resizeMode="cover"
+                onLoadEnd={() => handleImageLoadEnd(image.id)}
+                onError={() => handleImageError(image.id)}
               />
             )}
           </TouchableOpacity>
@@ -145,8 +141,8 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     paddingTop: 50,
+    backgroundColor: '#fefefe',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
   },
   grid: {
     flexDirection: 'row',
@@ -160,9 +156,9 @@ const styles = StyleSheet.create({
     margin: 5,
     backgroundColor: '#eee',
     borderRadius: 8,
+    overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
   },
   image: {
     width: '100%',
@@ -173,11 +169,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 1,
   },
-  errorBox: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#ccc',
+  errorContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#ddd',
+    width: '100%',
+    height: '100%',
+  },
+  errorText: {
+    color: '#444',
+    fontSize: 12,
   },
 });
