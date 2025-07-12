@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Dimensions, Text } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
 const imagePairs = [
@@ -60,7 +60,7 @@ export default function Index() {
     setStates(prev =>
       prev.map((state, i) => {
         if (i !== index) return state;
-        if (state.clicks >= 2) return state;
+        if (state.clicks >= 2) return state; // Batasi maksimal 2 klik (maks skala 2.4)
 
         return {
           ...state,
@@ -82,13 +82,18 @@ export default function Index() {
             key={index}
             activeOpacity={0.9}
             onPress={() => handleImagePress(index)}
-            style={{ transform: [{ scale }] }}
+            disabled={state.clicks >= 2}
+            style={{ transform: [{ scale }], margin: 5 }}
           >
             <ExpoImage
               source={{ uri: state.isAlt ? pair.alt : pair.main }}
               style={styles.image}
               contentFit="cover"
+              onError={() => console.warn(`Gagal memuat gambar index ${index + 1}`)}
             />
+            {state.clicks >= 2 && (
+              <Text style={styles.label}>Maksimum</Text>
+            )}
           </TouchableOpacity>
         );
       })}
@@ -101,13 +106,22 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10,
     padding: 16,
   },
   image: {
     width: IMAGE_SIZE,
     height: IMAGE_SIZE,
     borderRadius: 10,
-    backgroundColor: '#eee',
+    backgroundColor: '#ccc',
+  },
+  label: {
+    position: 'absolute',
+    bottom: 5,
+    left: 5,
+    fontSize: 10,
+    color: 'white',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 4,
+    borderRadius: 4,
   },
 });
