@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
+// Array pasangan gambar: 9 gambar utama dan 9 alternatif
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -41,9 +42,11 @@ const imagePairs = [
   },
 ];
 
+// Menghitung ukuran sel gambar agar proporsional (3 kolom)
 const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
 
 export default function Index() {
+  // Menyimpan status untuk setiap gambar: berapa kali diklik & apakah gambar sudah berubah ke alternatif
   const [states, setStates] = useState(
     imagePairs.map(() => ({
       clickCount: 0,
@@ -51,14 +54,15 @@ export default function Index() {
     }))
   );
 
+  // Fungsi menangani klik pada gambar
   const handleImageClick = (index: number) => {
     setStates((prevStates) =>
       prevStates.map((item, i) => {
         if (i === index) {
-          if (item.clickCount >= 2) return item; // hanya boleh 2 klik
+          if (item.clickCount >= 2) return item; // Maksimum 2 klik
           return {
             clickCount: item.clickCount + 1,
-            isAlt: true, // langsung permanen ke gambar alternatif
+            isAlt: true, // Ganti ke alternatif dan tetap di sana
           };
         }
         return item;
@@ -70,8 +74,9 @@ export default function Index() {
     <View style={styles.container}>
       {imagePairs.map((pair, index) => {
         const { clickCount, isAlt } = states[index];
-        let scale = 1;
 
+        // Hitung nilai skala berdasarkan jumlah klik
+        let scale = 1;
         if (clickCount === 1) scale = 1.2;
         else if (clickCount === 2) scale = 2.4;
 
