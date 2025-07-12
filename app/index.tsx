@@ -67,31 +67,26 @@ const images: ImageItem[] = [
 export default function IndexPage() {
   const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
   const [scales, setScales] = useState<number[]>(Array(images.length).fill(1));
-  const [animatedScales] = useState<Animated.Value[]>(
-    () => images.map(() => new Animated.Value(1))
-  );
+  const [animatedScales] = useState(() => images.map(() => new Animated.Value(1)));
 
   const handlePress = (index: number) => {
     const currentScale = scales[index];
     let nextScale = currentScale * 1.2;
-
     if (nextScale > 2.0) nextScale = 2.0;
 
-    // Toggle gambar alternatif saat pertama kali diklik
-    if (!useAltImages[index]) {
-      const updatedAlt = [...useAltImages];
-      updatedAlt[index] = true;
-      setUseAltImages(updatedAlt);
-    }
-
-    // Simpan nilai skala
     const updatedScales = [...scales];
     updatedScales[index] = nextScale;
     setScales(updatedScales);
 
+    const updatedAltImages = [...useAltImages];
+    if (!useAltImages[index]) {
+      updatedAltImages[index] = true;
+      setUseAltImages(updatedAltImages);
+    }
+
     Animated.timing(animatedScales[index], {
       toValue: nextScale,
-      duration: 250,
+      duration: 300,
       useNativeDriver: true,
     }).start();
   };
