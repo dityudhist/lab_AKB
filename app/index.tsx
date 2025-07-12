@@ -81,7 +81,7 @@ export default function App() {
       // Hitung skala baru
       let newScale = 1;
       if (item.clickCount === 1) newScale = 1.2;
-      else if (item.clickCount === 2) newScale = 2.4;
+      else if (item.clickCount === 2) newScale = 2.0;
 
       // Eksekusi animasi skala
       Animated.timing(item.scale, {
@@ -140,8 +140,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   cell: {
-    width: cellSize,
-    height: cellSize,
+    width: 200,
+    height: 200,
     margin: 5,
     justifyContent: "center",
     alignItems: "center",
@@ -150,8 +150,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   image: {
-    width: "100%",
-    height: "100%",
+    width: "50%",
+    height: "50%",
   },
   footer: {
     marginTop: 20,
