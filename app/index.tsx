@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
-// 9 gambar utama dan 9 alternatif
+// Pasangan gambar (utama dan alternatif)
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -42,26 +42,30 @@ const imagePairs = [
   },
 ];
 
-// Hitung ukuran gambar berdasarkan layar (agar muat 3 kolom)
+// Ukuran gambar 3 kolom responsif
 const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
 
 export default function Index() {
   const [states, setStates] = useState(
     imagePairs.map(() => ({
-      clickCount: 0,  // jumlah klik
-      isAlt: false,   // apakah gambar alternatif sudah aktif
+      clickCount: 0,
+      isAlt: false,
     }))
   );
 
   const handleImageClick = (index: number) => {
     setStates((prevStates) =>
-      prevStates.map((state, i) => {
-        if (i !== index) return state;
-        if (state.clickCount >= 2) return state; // maksimal 2 klik
+      prevStates.map((item, i) => {
+        if (i !== index) return item;
+
+        const nextClick = item.clickCount + 1;
+        const nextScale = nextClick === 1 ? 1.2 : nextClick === 2 ? 2.0 : item.clickCount;
+
+        if (nextScale > 2.0) return item; // Tidak boleh lebih dari 2x
 
         return {
-          clickCount: state.clickCount + 1,
-          isAlt: true, // ganti ke gambar alternatif permanen setelah klik pertama
+          clickCount: nextClick,
+          isAlt: true,
         };
       })
     );
@@ -72,15 +76,21 @@ export default function Index() {
       {imagePairs.map((pair, index) => {
         const { clickCount, isAlt } = states[index];
 
-        // Scale berdasarkan jumlah klik
+        // Hitung skala berdasarkan jumlah klik
         const scale =
           clickCount === 0 ? 1 :
-          clickCount === 1 ? 1.2 : 2.4;
+          clickCount === 1 ? 1.2 :
+          clickCount === 2 ? 2.0 : 2.0;
+
+        // Jika sudah lebih dari 2x, nonaktifkan klik
+        const disableClick = scale >= 2.0;
 
         return (
           <TouchableOpacity
             key={index}
-            onPress={() => handleImageClick(index)}
+            onPress={() => {
+              if (!disableClick) handleImageClick(index);
+            }}
             activeOpacity={0.9}
             style={{ transform: [{ scale }] }}
           >
