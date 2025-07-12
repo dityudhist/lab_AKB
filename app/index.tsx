@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
-// Pasangan gambar (utama dan alternatif)
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -42,7 +41,7 @@ const imagePairs = [
   },
 ];
 
-// Ukuran gambar 3 kolom responsif
+// Ukuran gambar 3 kolom
 const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
 
 export default function Index() {
@@ -58,13 +57,14 @@ export default function Index() {
       prevStates.map((item, i) => {
         if (i !== index) return item;
 
-        const nextClick = item.clickCount + 1;
-        const nextScale = nextClick === 1 ? 1.2 : nextClick === 2 ? 2.0 : item.clickCount;
+        const newClickCount = item.clickCount + 1;
+        const newScale = 1 + newClickCount * 1.2;
 
-        if (nextScale > 2.0) return item; // Tidak boleh lebih dari 2x
+        // Jika scale melebihi 2.4, jangan izinkan klik lagi
+        if (newScale > 2.4) return item;
 
         return {
-          clickCount: nextClick,
+          clickCount: newClickCount,
           isAlt: true,
         };
       })
@@ -75,21 +75,14 @@ export default function Index() {
     <View style={styles.container}>
       {imagePairs.map((pair, index) => {
         const { clickCount, isAlt } = states[index];
-
-        // Hitung skala berdasarkan jumlah klik
-        const scale =
-          clickCount === 0 ? 1 :
-          clickCount === 1 ? 1.2 :
-          clickCount === 2 ? 2.4 : 2.4;
-
-        // Jika sudah lebih dari 2x, nonaktifkan klik
-        const disableClick = scale >= 2.4;
+        const scale = 1 + clickCount * 1.2;
+        const isMaxScale = scale >= 2.4;
 
         return (
           <TouchableOpacity
             key={index}
             onPress={() => {
-              if (!disableClick) handleImageClick(index);
+              if (!isMaxScale) handleImageClick(index);
             }}
             activeOpacity={0.9}
             style={{ transform: [{ scale }] }}
