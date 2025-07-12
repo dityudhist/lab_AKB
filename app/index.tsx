@@ -74,12 +74,9 @@ export default function App() {
       if (item.clickCount >= 2) return updated;
 
       item.clickCount += 1;
+      item.isAlt = true;
 
-      if (item.clickCount >= 1) {
-        item.isAlt = true;
-      }
-
-      const scaleValue = item.clickCount === 1 ? 1.2 : 1.2 * 2; // 2.4
+      const scaleValue = item.clickCount === 1 ? 1.2 : 2;
 
       Animated.timing(item.scale, {
         toValue: scaleValue,
@@ -137,8 +134,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   cell: {
-    width: 200,
-    height: 200,
+    width: cellSize,
+    height: cellSize,
     margin: 5,
     justifyContent: "center",
     alignItems: "center",
@@ -147,8 +144,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   image: {
-    width: "50%",
-    height: "50%",
+    width: "100%",
+    height: "100%",
   },
   footer: {
     marginTop: 20,
