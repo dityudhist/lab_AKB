@@ -67,26 +67,30 @@ const images: ImageItem[] = [
 export default function IndexPage() {
   const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
   const [scales, setScales] = useState<number[]>(Array(images.length).fill(1));
-  const [animatedScales] = useState(
-    () => Array(images.length).fill(null).map(() => new Animated.Value(1))
+  const [animatedScales] = useState<Animated.Value[]>(
+    () => images.map(() => new Animated.Value(1))
   );
 
   const handlePress = (index: number) => {
     const currentScale = scales[index];
-    const nextScale = Math.min(currentScale * 1.2, 2.0);
 
-    // Jika belum pakai alt, ubah saat klik pertama
+    // Hitung skala berikutnya
+    let nextScale = currentScale * 1.2;
+    if (nextScale > 2.0) nextScale = 2.0;
+
+    // Perbarui gambar alternatif saat klik pertama
     if (!useAltImages[index]) {
       const updatedAlt = [...useAltImages];
       updatedAlt[index] = true;
       setUseAltImages(updatedAlt);
     }
 
-    // Update nilai skala
+    // Simpan nilai skala baru
     const updatedScales = [...scales];
     updatedScales[index] = nextScale;
     setScales(updatedScales);
 
+    // Jalankan animasi
     Animated.timing(animatedScales[index], {
       toValue: nextScale,
       duration: 300,
