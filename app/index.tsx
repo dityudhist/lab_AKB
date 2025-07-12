@@ -60,7 +60,7 @@ const images: ImageItem[] = [
   {
     id: 9,
     main: "https://i.pinimg.com/736x/24/46/75/24467588c748f4fb716da446e43e5d62.jpg",
-    alt: "https://i.imgur.com/Z3KU4u7.jpg", // Ganti ke URL valid
+    alt: "https://i.imgur.com/Z3KU4u7.jpg",
   },
 ];
 
@@ -68,28 +68,27 @@ export default function IndexPage() {
   const [clickCounts, setClickCounts] = useState<number[]>(Array(images.length).fill(0));
   const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
   const [animatedScales] = useState(
-    Array(images.length).fill(null).map(() => new Animated.Value(1))
+    () => Array(images.length).fill(null).map(() => new Animated.Value(1))
   );
 
   const handlePress = (index: number) => {
     if (clickCounts[index] >= 2) return;
 
-    const updatedClickCounts = [...clickCounts];
-    updatedClickCounts[index]++;
-    setClickCounts(updatedClickCounts);
+    const updatedClicks = [...clickCounts];
+    updatedClicks[index]++;
+    setClickCounts(updatedClicks);
 
-    const updatedAltImages = [...useAltImages];
-    if (updatedClickCounts[index] === 1) {
-      updatedAltImages[index] = true; // Ganti ke gambar alternatif saat klik pertama
-      setUseAltImages(updatedAltImages);
+    const updatedAlts = [...useAltImages];
+    if (updatedClicks[index] === 1) {
+      updatedAlts[index] = true;
+      setUseAltImages(updatedAlts);
     }
 
-    // Hitung skala berdasarkan klik ke-1 atau ke-2
-    const currentScale = updatedClickCounts[index] === 1 ? 1.2 : 1.2 * 1.2;
-    const finalScale = Math.min(currentScale, 2.0);
+    // Hitung skala progresif: klik 1 → 1.2x, klik 2 → 1.44x
+    const nextScale = updatedClicks[index] === 1 ? 1.2 : 1.44;
 
     Animated.timing(animatedScales[index], {
-      toValue: finalScale,
+      toValue: Math.min(nextScale, 2.0),
       duration: 300,
       useNativeDriver: true,
     }).start();
