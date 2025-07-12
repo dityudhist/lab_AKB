@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Pressable,
-  Animated,
-  FlatList,
-  Text,
-  Dimensions,
-} from "react-native";
+import React, { useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Dimensions, Animated } from 'react-native';
 
-// 9 gambar utama dan alternatif
-const images = [
+const { width } = Dimensions.get('window');
+const IMAGE_SIZE = width / 3;
+
+type ImageItem = {
+  id: number;
+  main: string;
+  alt: string;
+};
+
+const images: ImageItem[] = [
   {
     id: 1,
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -58,130 +58,60 @@ const images = [
   },
 ];
 
-// Ukuran sel dihitung dari lebar layar
-const screenWidth = Dimensions.get("window").width;
-const cellSize = screenWidth / 3 - 12;
-
-export default function App() {
-  const [imageStates, setImageStates] = useState(
-    images.map(() => ({
-      clickCount: 0,
-      isAlt: false,
-      scale: new Animated.Value(1),
-      fallback: false,
-    }))
+export default function IndexPage() {
+  const [clickCounts, setClickCounts] = useState(Array(images.length).fill(0));
+  const [useAltImages, setUseAltImages] = useState(Array(images.length).fill(false));
+  const [animatedScales] = useState(
+    Array(images.length).fill(null).map(() => new Animated.Value(1))
   );
 
   const handlePress = (index: number) => {
-    setImageStates((prev) => {
-      const updated = [...prev];
-      const item = updated[index];
+    const counts = [...clickCounts];
+    if (counts[index] >= 2) return;
 
-      if (item.clickCount >= 2) return prev; // batas maksimal 2 klik
+    counts[index]++;
+    setClickCounts(counts);
 
-      const nextClick = item.clickCount + 1;
-      const targetScale = nextClick === 1 ? 1.2 : 2;
-      const safeScale = Math.min(targetScale, 2); // batas aman 2x
+    const newAlt = [...useAltImages];
+    if (counts[index] === 1) {
+      newAlt[index] = true;
+      setUseAltImages(newAlt);
+    }
 
-      Animated.timing(item.scale, {
-        toValue: safeScale,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-
-      updated[index] = {
-        ...item,
-        clickCount: nextClick,
-        isAlt: true,
-        scale: item.scale,
-      };
-
-      return updated;
-    });
-  };
-
-  const handleImageError = (index: number) => {
-    setImageStates((prev) => {
-      const updated = [...prev];
-      updated[index].fallback = true;
-      return updated;
-    });
-  };
-
-  const renderItem = ({ item, index }: any) => {
-    const state = imageStates[index];
-    const imageUrl = state.fallback
-      ? "https://via.placeholder.com/150?text=Image+Error"
-      : state.isAlt
-      ? item.alt
-      : item.main;
-
-    return (
-      <Pressable onPress={() => handlePress(index)} style={styles.cell}>
-        <Animated.Image
-          source={{ uri: imageUrl }}
-          style={[styles.image, { transform: [{ scale: state.scale }] }]}
-          onError={() => handleImageError(index)}
-          resizeMode="cover"
-        />
-      </Pressable>
-    );
+    const newScale = counts[index] === 1 ? 1.2 : 2.0;
+    Animated.timing(animatedScales[index], {
+      toValue: newScale,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
   };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={images}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={3}
-        scrollEnabled={false}
-        contentContainerStyle={styles.grid}
-      />
-      <View style={styles.footer}>
-        <Text style={styles.name}>Muhammad Aditya Yudhistira</Text>
-        <Text style={styles.nim}>105841114122</Text>
-      </View>
-    </View>
+    <FlatList
+      data={images}
+      numColumns={3}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item, index }) => (
+        <Pressable onPress={() => handlePress(index)}>
+          <Animated.Image
+            source={{ uri: useAltImages[index] ? item.alt : item.main }}
+            style={[
+              styles.image,
+              { transform: [{ scale: animatedScales[index] }] },
+            ]}
+            resizeMode="cover"
+          />
+        </Pressable>
+      )}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 50,
-    backgroundColor: "#f0f0f0",
-    alignItems: "center",
-  },
-  grid: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cell: {
-    width: cellSize,
-    height: cellSize,
-    margin: 5,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    overflow: "hidden",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   image: {
-    width: "100%",
-    height: "100%",
-  },
-  footer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  nim: {
-    fontSize: 14,
-    color: "#666",
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
 });
