@@ -72,7 +72,7 @@ export default function Index() {
     setImages(prev =>
       prev.map(image => {
         if (image.id === id) {
-          const newScale = Math.min(image.scale + 1.2, 2.4);
+          const newScale = Math.min(image.scale + 0.2, 2.4);
           return {
             ...image,
             scale: newScale,
