@@ -1,128 +1,100 @@
 import React, { useState } from 'react';
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Dimensions,
-  Image,
-  View,
-} from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Animated, Dimensions } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 
-const { width } = Dimensions.get('window');
-const IMAGE_SIZE = width / 3;
-
-type ImageItem = {
-  id: number;
-  main: string;
-  alt: string;
-};
-
-const images: ImageItem[] = [
+const imagePairs = [
   {
-    id: 1,
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
     alt: "https://i.pinimg.com/736x/9a/1e/db/9a1edb3a20db9a56dd8c7adc4a32ba6a.jpg",
   },
   {
-    id: 2,
     main: "https://i.pinimg.com/736x/e5/b9/8a/e5b98aa4319968c4785b259a9ccdcb2e.jpg",
     alt: "https://i.pinimg.com/736x/92/39/c5/9239c5a50c50781c82dcf3006350fece.jpg",
   },
   {
-    id: 3,
     main: "https://i.pinimg.com/736x/7c/14/c8/7c14c8596bb124afd094a5a4a9b4247b.jpg",
     alt: "https://i.pinimg.com/736x/83/1d/5b/831d5b81372b8b0192acd49323fb06c6.jpg",
   },
   {
-    id: 4,
     main: "https://i.pinimg.com/736x/93/ee/ea/93eeea78e003dd356aa0d22f7a15d91f.jpg",
     alt: "https://i.pinimg.com/736x/25/38/02/253802fab9b96754dd6356bccc9464bb.jpg",
   },
   {
-    id: 5,
     main: "https://i.pinimg.com/736x/4f/40/d3/4f40d35b156f79a0b421296f0d8f5c32.jpg",
     alt: "https://i.pinimg.com/736x/83/18/58/83185882b35ffebaef4dde926043f16f.jpg",
   },
   {
-    id: 6,
     main: "https://i.pinimg.com/736x/c0/0c/ed/c00ceda54d7346b7ffa846edf3be1a08.jpg",
     alt: "https://i.pinimg.com/736x/11/18/ca/1118ca3ad0419b362f26ae5a1a1c2056.jpg",
   },
   {
-    id: 7,
     main: "https://i.pinimg.com/736x/cb/51/43/cb51431ce5984f28b1f29314904437c6.jpg",
     alt: "https://i.pinimg.com/736x/06/0f/4b/060f4b51059a74ca7880e0a136a25788.jpg",
   },
   {
-    id: 8,
     main: "https://i.pinimg.com/736x/51/8f/22/518f22aeb8cb1aae2a08dcbf1ca930b9.jpg",
     alt: "https://i.pinimg.com/1200x/8f/32/0e/8f320ef24a24f093f8ffa474dfb767c8.jpg",
   },
   {
-    id: 9,
     main: "https://i.pinimg.com/736x/24/46/75/24467588c748f4fb716da446e43e5d62.jpg",
     alt: "https://i.imgur.com/Z3KU4u7.jpg",
   },
 ];
 
-export default function IndexPage() {
-  const [clickCounts, setClickCounts] = useState<number[]>(Array(images.length).fill(0));
-  const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
+export default function Index() {
+  const [states, setStates] = useState(
+    imagePairs.map(() => ({
+      clicked: 0,
+      showAlt: false,
+    }))
+  );
 
-  const handlePress = (index: number) => {
-    const current = clickCounts[index];
-    if (current >= 2) return; // Maksimal 2 kali klik
-
-    const newCounts = [...clickCounts];
-    newCounts[index]++;
-    setClickCounts(newCounts);
-
-    // Klik pertama → ubah gambar ke alternatif
-    if (newCounts[index] === 1) {
-      const newAlts = [...useAltImages];
-      newAlts[index] = true;
-      setUseAltImages(newAlts);
-    }
-  };
-
-  const getScale = (clickCount: number): number => {
-    return 1 + clickCount * 1.2; // Normal 1 → klik1: 1.2 → klik2: 2.4
+  const handleClick = (index: number) => {
+    setStates((prevStates) =>
+      prevStates.map((state, i) =>
+        i === index
+          ? {
+              clicked: Math.min(state.clicked + 1, 2), // Maksimal klik 2
+              showAlt: !state.showAlt,
+            }
+          : state
+      )
+    );
   };
 
   return (
-    <FlatList
-      data={images}
-      numColumns={3}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item, index }) => {
-        const scale = getScale(clickCounts[index]);
+    <View style={styles.container}>
+      {imagePairs.map((pair, index) => {
+        const state = states[index];
+        const scale = 1.2 ** state.clicked;
 
         return (
-          <Pressable onPress={() => handlePress(index)}>
-            <View style={[styles.imageContainer, { transform: [{ scale }] }]}>
-              <Image
-                source={{ uri: useAltImages[index] ? item.alt : item.main }}
+          <TouchableOpacity key={index} onPress={() => handleClick(index)}>
+            <Animated.View style={{ transform: [{ scale }] }}>
+              <ExpoImage
+                source={{ uri: state.showAlt ? pair.alt : pair.main }}
                 style={styles.image}
+                contentFit="cover"
               />
-            </View>
-          </Pressable>
+            </Animated.View>
+          </TouchableOpacity>
         );
-      }}
-    />
+      })}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  imageContainer: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
+  container: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
-    alignItems: 'center',
+    paddingVertical: 40,
+    gap: 10,
   },
   image: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    width: Dimensions.get('window').width / 3.3,
+    height: Dimensions.get('window').width / 3.3,
+    borderRadius: 10,
   },
 });
