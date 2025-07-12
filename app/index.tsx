@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Dimensions, Animated } from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Dimensions,
+  Animated,
+} from 'react-native';
 
 const { width } = Dimensions.get('window');
 const IMAGE_SIZE = width / 3;
@@ -78,9 +84,13 @@ export default function IndexPage() {
       setUseAltImages(newAlt);
     }
 
-    const newScale = counts[index] === 1 ? 1.2 : 2.0;
+    // Ambil skala terakhir lalu naikkan 1.2x, maksimal 2.0x
+    const currentScale = animatedScales[index]._value || 1;
+    let nextScale = currentScale * 1.2;
+    if (nextScale > 2.0) nextScale = 2.0;
+
     Animated.timing(animatedScales[index], {
-      toValue: newScale,
+      toValue: nextScale,
       duration: 300,
       useNativeDriver: true,
     }).start();
