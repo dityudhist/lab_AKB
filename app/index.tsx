@@ -38,7 +38,7 @@ export default function App() {
 
       if (!current.isAlt) current.isAlt = true;
 
-      const nextScale = current.clickCount === 0 ? 1.2 : 2.4;
+      const nextScale = current.clickCount === 0 ? 1.2 : 2;
 
       Animated.timing(current.scale, {
         toValue: nextScale,
