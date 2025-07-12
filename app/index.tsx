@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
-// Pasangan gambar utama dan alternatif
+// 9 pasangan gambar utama dan alternatif
 const imagePairs = [
   {
     main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg",
@@ -42,34 +42,32 @@ const imagePairs = [
   },
 ];
 
-// Ukuran gambar agar membentuk grid 3x3
-const IMAGE_SIZE = Dimensions.get('window').width / 3 - 20;
+// Ukuran untuk grid 3x3
+const IMAGE_SIZE = Dimensions.get("window").width / 3 - 20;
 
 export default function Index() {
-  // State: setiap gambar punya skala, altStatus, dan flag selesai
   const [states, setStates] = useState(
     imagePairs.map(() => ({
+      clicks: 0,
       scale: 1.0,
       isAlt: false,
-      isMaxed: false,
     }))
   );
 
   const handleImageClick = (index: number) => {
-    setStates(prev =>
-      prev.map((item, i) => {
+    setStates(prevStates =>
+      prevStates.map((item, i) => {
         if (i !== index) return item;
 
-        if (item.isMaxed) return item;
+        if (item.clicks >= 2) return item; // Batas 2 klik
 
-        const nextScale = item.scale + 1.2;
-        const isFinal = nextScale >= 2.4;
+        const nextClicks = item.clicks + 1;
+        const nextScale = 1 + nextClicks * 1.2;
 
         return {
-          ...item,
-          scale: isFinal ? 2.4 : nextScale,
+          clicks: nextClicks,
+          scale: nextScale > 2.4 ? 2.4 : nextScale,
           isAlt: true,
-          isMaxed: isFinal,
         };
       })
     );
@@ -101,9 +99,9 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
     gap: 10,
     padding: 16,
   },
