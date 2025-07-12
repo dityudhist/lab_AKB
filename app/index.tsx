@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,11 +6,8 @@ import {
   Animated,
   FlatList,
   Text,
-  Dimensions,
 } from "react-native";
 
-// --- DATA GAMBAR ---
-// Array yang berisi 9 pasang gambar (utama dan alternatif)
 const images = [
   { id: 1, main: "https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg", alt: "https://i.pinimg.com/736x/9a/1e/db/9a1edb3a20db9a56dd8c7adc4a32ba6a.jpg" },
   { id: 2, main: "https://i.pinimg.com/736x/e5/b9/8a/e5b98aa4319968c4785b259a9ccdcb2e.jpg", alt: "https://i.pinimg.com/736x/92/39/c5/9239c5a50c50781c82dcf3006350fece.jpg" },
@@ -23,83 +20,47 @@ const images = [
   { id: 9, main: "https://i.pinimg.com/736x/24/46/75/24467588c748f4fb716da446e43e5d62.jpg", alt: "https://i.pinimg.com/736x/7c/36/85/7c36859aa49c9360c09e1214fb494199.jpg" },
 ];
 
-// --- PENGATURAN RESPONSIVE ---
-// Menghitung ukuran sel gambar agar pas di layar
-const { width } = Dimensions.get("window");
-const numColumns = 3;
-// Variabel marginSize sekarang sudah didefinisikan dengan benar
-const marginSize = 8; 
-const itemSize = (width - marginSize * (numColumns * 2)) / numColumns;
-
 export default function App() {
-  // --- STATE MANAGEMENT ---
-  // Inisialisasi state untuk setiap gambar.
-  // Menggunakan useRef agar Animated.Value tidak dibuat ulang setiap render.
-  // Ini menangani 'Inisialisasi Animated.Value' dan 'penskalaan individual'.
-  const imageStates = useRef(
+  const [imageStates, setImageStates] = useState(
     images.map(() => ({
       isAlt: false,
       scale: new Animated.Value(1),
       clickCount: 0,
     }))
-  ).current;
+  );
 
-  // State untuk memicu re-render setelah state di useRef berubah
-  const [_, setForceRender] = useState(0);
-
-  // --- LOGIKA UTAMA ---
-  // Fungsi ini menangani semua logika saat gambar ditekan.
   const handlePress = (index: number) => {
-    const imageToUpdate = imageStates[index];
+    setImageStates((prev) => {
+      const newStates = [...prev];
+      const current = newStates[index];
 
-    // 1. Batasan Penskalaan Maksimum: Jika sudah diklik 2x, hentikan.
-    if (imageToUpdate.clickCount >= 2) {
-      return;
-    }
+      if (current.clickCount >= 2) return newStates; // Maksimum 2 klik
 
-    // 2. Penskalaan Bertahap: Tentukan skala berikutnya.
-    // Klik pertama -> 1.2, Klik kedua -> 2.4
-    const nextScale = imageToUpdate.clickCount === 0 ? 1.2 : 2.4;
+      if (!current.isAlt) current.isAlt = true;
 
-    // 3. Jalankan Animasi Penskalaan: Implementasi logika penskalaan.
-    Animated.timing(imageToUpdate.scale, {
-      toValue: nextScale,
-      duration: 300,
-      useNativeDriver: true, // Penting untuk performa animasi yang mulus
-    }).start();
+      const nextScale = current.clickCount === 0 ? 1.2 : 2.4;
 
-    // 4. Penggantian Gambar & Update State: Implementasi logika penggantian gambar.
-    imageToUpdate.isAlt = true;
-    imageToUpdate.clickCount += 1;
+      Animated.timing(current.scale, {
+        toValue: nextScale,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
 
-    // Paksa komponen untuk re-render agar perubahan gambar (isAlt) terlihat
-    setForceRender(val => val + 1);
+      current.clickCount += 1;
+      return newStates;
+    });
   };
 
-  // --- RENDER KOMPONEN ---
-  // Fungsi untuk merender setiap item dalam FlatList
-  const renderItem = ({ item, index }: { item: typeof images[0], index: number }) => {
+  const renderItem = ({ item, index }: any) => {
     const state = imageStates[index];
 
     return (
-      <Pressable onPress={() => handlePress(index)}>
-        {/* Wrapper ini penting agar 'scale' tidak terpotong */}
-        <View style={styles.imageWrapper}>
-          <Animated.Image
-            // Pilih gambar 'alt' jika isAlt true, jika tidak tampilkan 'main'
-            source={{ uri: state.isAlt ? item.alt : item.main }}
-            style={[
-              styles.image,
-              {
-                // Terapkan animasi skala dari state
-                transform: [{ scale: state.scale }],
-                // zIndex memastikan gambar yang membesar tampil di atas yang lain
-                zIndex: state.clickCount > 0 ? 10 : 1,
-              },
-            ]}
-            resizeMode="cover"
-          />
-        </View>
+      <Pressable onPress={() => handlePress(index)} style={styles.cell}>
+        <Animated.Image
+          source={{ uri: state.isAlt ? item.alt : item.main }}
+          style={[styles.image, { transform: [{ scale: state.scale }] }]}
+          resizeMode="cover"
+        />
       </Pressable>
     );
   };
@@ -110,9 +71,8 @@ export default function App() {
         data={images}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        numColumns={numColumns}
+        numColumns={3}
         scrollEnabled={false}
-        contentContainerStyle={styles.listContentContainer}
       />
       <View style={styles.footer}>
         <Text style={styles.name}>Muhammad Aditya Yudhistira</Text>
@@ -122,47 +82,38 @@ export default function App() {
   );
 }
 
-// --- STYLESHEET ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 50,
+    alignItems: "center",
     backgroundColor: "#f0f0f0",
-    justifyContent: "center",
   },
-  listContentContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: marginSize,
-  },
-  imageWrapper: {
-    width: itemSize,
-    height: itemSize,
-    margin: marginSize,
-    // Gaya ini penting agar gambar yang membesar tidak terpotong oleh batas view
-    overflow: "visible",
+  cell: {
+    width: 100,
+    height: 100,
+    margin: 5,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    overflow: "hidden",
   },
   image: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 12,
-    backgroundColor: '#ccc' // Warna placeholder jika gambar lambat dimuat
+    width: 100,
+    height: 100,
   },
   footer: {
-    paddingVertical: 20,
+    marginTop: 20,
     alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-    backgroundColor: '#fff',
   },
   name: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#333",
   },
   nim: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#555",
   },
 });
