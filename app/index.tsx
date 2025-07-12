@@ -27,13 +27,15 @@ const images = [
 // Menghitung ukuran sel gambar agar pas di layar
 const { width } = Dimensions.get("window");
 const numColumns = 3;
-const marginSize = 8; // Memberi sedikit ruang antar gambar
+// Variabel marginSize sekarang sudah didefinisikan dengan benar
+const marginSize = 8; 
 const itemSize = (width - marginSize * (numColumns * 2)) / numColumns;
 
 export default function App() {
   // --- STATE MANAGEMENT ---
   // Inisialisasi state untuk setiap gambar.
   // Menggunakan useRef agar Animated.Value tidak dibuat ulang setiap render.
+  // Ini menangani 'Inisialisasi Animated.Value' dan 'penskalaan individual'.
   const imageStates = useRef(
     images.map(() => ({
       isAlt: false,
@@ -46,7 +48,7 @@ export default function App() {
   const [_, setForceRender] = useState(0);
 
   // --- LOGIKA UTAMA ---
-  // Fungsi ini dijalankan setiap kali sebuah gambar ditekan.
+  // Fungsi ini menangani semua logika saat gambar ditekan.
   const handlePress = (index: number) => {
     const imageToUpdate = imageStates[index];
 
@@ -59,17 +61,15 @@ export default function App() {
     // Klik pertama -> 1.2, Klik kedua -> 2.4
     const nextScale = imageToUpdate.clickCount === 0 ? 1.2 : 2.4;
 
-    // 3. Jalankan Animasi Penskalaan
+    // 3. Jalankan Animasi Penskalaan: Implementasi logika penskalaan.
     Animated.timing(imageToUpdate.scale, {
       toValue: nextScale,
       duration: 300,
       useNativeDriver: true, // Penting untuk performa animasi yang mulus
     }).start();
 
-    // 4. Penggantian Gambar & Update State
-    // Tandai gambar untuk diubah ke versi alternatifnya
+    // 4. Penggantian Gambar & Update State: Implementasi logika penggantian gambar.
     imageToUpdate.isAlt = true;
-    // Tambah jumlah klik
     imageToUpdate.clickCount += 1;
 
     // Paksa komponen untuk re-render agar perubahan gambar (isAlt) terlihat
