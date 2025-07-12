@@ -65,31 +65,30 @@ const images: ImageItem[] = [
 ];
 
 export default function IndexPage() {
-  const [clickCounts, setClickCounts] = useState<number[]>(Array(images.length).fill(0));
   const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
-  const [animatedScales] = useState<Animated.Value[]>(
-    () => images.map(() => new Animated.Value(1))
+  const [scales, setScales] = useState<number[]>(Array(images.length).fill(1));
+  const [animatedScales] = useState(
+    () => Array(images.length).fill(null).map(() => new Animated.Value(1))
   );
 
   const handlePress = (index: number) => {
-    if (clickCounts[index] >= 2) return;
+    const currentScale = scales[index];
+    const nextScale = Math.min(currentScale * 1.2, 2.0);
 
-    const updatedCounts = [...clickCounts];
-    updatedCounts[index] += 1;
-    setClickCounts(updatedCounts);
-
-    // Ganti ke gambar alternatif saat klik pertama
-    if (updatedCounts[index] === 1) {
-      const updatedAlts = [...useAltImages];
-      updatedAlts[index] = true;
-      setUseAltImages(updatedAlts);
+    // Jika belum pakai alt, ubah saat klik pertama
+    if (!useAltImages[index]) {
+      const updatedAlt = [...useAltImages];
+      updatedAlt[index] = true;
+      setUseAltImages(updatedAlt);
     }
 
-    // Hitung skala per klik
-    const scale = updatedCounts[index] === 1 ? 1.2 : 2.0;
+    // Update nilai skala
+    const updatedScales = [...scales];
+    updatedScales[index] = nextScale;
+    setScales(updatedScales);
 
     Animated.timing(animatedScales[index], {
-      toValue: scale,
+      toValue: nextScale,
       duration: 300,
       useNativeDriver: true,
     }).start();
