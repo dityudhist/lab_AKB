@@ -4,7 +4,8 @@ import {
   Pressable,
   StyleSheet,
   Dimensions,
-  Animated,
+  Image,
+  View,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -66,34 +67,26 @@ const images: ImageItem[] = [
 
 export default function IndexPage() {
   const [useAltImages, setUseAltImages] = useState<boolean[]>(Array(images.length).fill(false));
-  const [scales, setScales] = useState<number[]>(Array(images.length).fill(1));
-  const [animatedScales] = useState(() => images.map(() => new Animated.Value(1)));
+  const [clickCounts, setClickCounts] = useState<number[]>(Array(images.length).fill(0));
 
   const handlePress = (index: number) => {
-    const currentScale = scales[index];
+    const newClickCounts = [...clickCounts];
+    if (newClickCounts[index] >= 2) return; // Maksimal 2 kali klik
+    newClickCounts[index]++;
+    setClickCounts(newClickCounts);
 
-    // Klik pertama: skala 1.2x
-    // Klik berikutnya: skala += 1.2, tetapi dibatasi max 2.0
-    const nextScale = Math.min(currentScale === 1 ? 1.2 : currentScale + 1.2, 2.4);
-
-    // Ganti gambar ke alternatif jika belum
     if (!useAltImages[index]) {
-      const updatedUseAlt = [...useAltImages];
-      updatedUseAlt[index] = true;
-      setUseAltImages(updatedUseAlt);
+      const newUseAltImages = [...useAltImages];
+      newUseAltImages[index] = true;
+      setUseAltImages(newUseAltImages);
     }
+  };
 
-    // Simpan skala baru
-    const updatedScales = [...scales];
-    updatedScales[index] = nextScale;
-    setScales(updatedScales);
-
-    // Jalankan animasi transform scale
-    Animated.timing(animatedScales[index], {
-      toValue: nextScale,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+  const getScale = (clickCount: number) => {
+    if (clickCount === 0) return 1;
+    if (clickCount === 1) return 1.2;
+    if (clickCount === 2) return 2.0;
+    return 2.0; // Batas maksimum
   };
 
   return (
@@ -101,23 +94,36 @@ export default function IndexPage() {
       data={images}
       numColumns={3}
       keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item, index }) => (
-        <Pressable onPress={() => handlePress(index)}>
-          <Animated.Image
-            source={{ uri: useAltImages[index] ? item.alt : item.main }}
-            style={[
-              styles.image,
-              { transform: [{ scale: animatedScales[index] }] },
-            ]}
-            resizeMode="cover"
-          />
-        </Pressable>
-      )}
+      renderItem={({ item, index }) => {
+        const scale = getScale(clickCounts[index]);
+        return (
+          <Pressable onPress={() => handlePress(index)}>
+            <View
+              style={[
+                styles.imageContainer,
+                { transform: [{ scale }] },
+              ]}
+            >
+              <Image
+                source={{ uri: useAltImages[index] ? item.alt : item.main }}
+                style={styles.image}
+                resizeMode="cover"
+              />
+            </View>
+          </Pressable>
+        );
+      }}
     />
   );
 }
 
 const styles = StyleSheet.create({
+  imageContainer: {
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   image: {
     width: IMAGE_SIZE,
     height: IMAGE_SIZE,
