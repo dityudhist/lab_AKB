@@ -68,29 +68,31 @@ export default function App() {
 
   const handlePress = (index: number) => {
     setImageStates((prevStates) => {
-      const updatedStates = [...prevStates];
-      const item = updatedStates[index];
+      const newStates = [...prevStates];
+      const item = newStates[index];
 
-      // Maksimal 2 klik = tidak akan lanjut
-      if (item.clickCount >= 2) return updatedStates;
+      if (item.clickCount >= 2) return newStates;
 
-      // Ganti gambar jadi alternatif
-      item.isAlt = true;
       item.clickCount += 1;
 
-      // Hitung skala baru
-      let newScale = 1;
-      if (item.clickCount === 1) newScale = 1.2;
-      else if (item.clickCount === 2) newScale = 2.0;
+      // Ubah gambar menjadi alternatif saat klik pertama
+      if (item.clickCount >= 1) item.isAlt = true;
 
-      // Eksekusi animasi skala
+      let newScale = 1;
+
+      if (item.clickCount === 1) {
+        newScale = 1.2;
+      } else if (item.clickCount === 2) {
+        newScale = 1.2 * 2; // hasil dari klik pertama dikali 2 = 2.4
+      }
+
       Animated.timing(item.scale, {
         toValue: newScale,
         duration: 250,
         useNativeDriver: true,
       }).start();
 
-      return updatedStates;
+      return newStates;
     });
   };
 
