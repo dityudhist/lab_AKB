@@ -77,7 +77,7 @@ export default function App() {
   const handleImagePress = (id: number) => {
     setImages(prevImages =>
       prevImages.map(img => {
-        if (img.id === id && img.scale < 2.0) {
+        if (img.id === id && img.scale < 2.4) {
           const nextScale = Math.min(img.scale + 1.2, 2.4);
           return {
             ...img,
