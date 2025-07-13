@@ -27,6 +27,7 @@ export default function Index() {
     setGridImages(currentImages =>
       currentImages.map(image => {
         if (image.id === imageId) {
+          // Menghitung skala dengan batasan maksimal 2x
           const newScale = Math.min(image.scale * 1.2, 2);
           return {
             ...image,
