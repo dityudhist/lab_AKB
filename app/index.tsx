@@ -70,7 +70,7 @@ export default function App() {
     initialImages.map(img => ({
       ...img,
       isFlipped: false,
-      scale: 1.0,
+      scale: 1,
     }))
   );
 
