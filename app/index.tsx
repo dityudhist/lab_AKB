@@ -108,6 +108,7 @@ export default function App() {
           <TouchableOpacity
             key={image.id}
             onPress={() => handleImagePress(image.id)}
+            //skala gambar 2
             disabled={image.scale >= 2.0}
             style={styles.gridCell}
           >
