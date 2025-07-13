@@ -33,21 +33,23 @@ export default function Index() {
     }))
   );
 
-  const handlePress = (id: number) => {
-    setImages(prev =>
-      prev.map(image => {
-        if (image.id === id && image.clickCount < 2) {
-          return {
-            ...image,
-            isFlipped: true,
-            scale: Math.min(image.scale * 1.2, 2),
-            clickCount: image.clickCount + 1,
-          };
-        }
-        return image;
-      })
-    );
-  };
+const handlePress = (id: number) => {
+  setImages(prev =>
+    prev.map(image => {
+      if (image.id === id && image.clickCount < 2) {
+        const newScale = Math.min(image.scale + 0.2, 2);
+        return {
+          ...image,
+          isFlipped: true,
+          scale: newScale,
+          clickCount: image.clickCount + 1,
+        };
+      }
+      return image;
+    })
+  );
+};
+
 
   const handleLoadEnd = (id: number) => {
     setImages(prev =>
