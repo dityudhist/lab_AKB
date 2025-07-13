@@ -69,7 +69,7 @@ export default function App() {
     setImages(prevImages =>
       prevImages.map(img => {
         if (img.id === id && img.scale < 2.0) {
-          const nextScale = Math.min(img.scale * 1.2, 2.0);
+          const nextScale = img.scale === 1.0 ? 1.2 : 2.0;
           return {
             ...img,
             scale: nextScale,
@@ -83,7 +83,7 @@ export default function App() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Atas: Segitiga, Nama, NIM */}
+      {/* Segitiga, Nama, NIM */}
       <View style={styles.header}>
         <View style={styles.triangle} />
         <View style={styles.nameBox}>
