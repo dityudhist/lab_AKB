@@ -69,15 +69,15 @@ export default function App() {
   const [images, setImages] = useState(
     initialImages.map(img => ({
       ...img,
-      // isFlipped: false,
-      // scale: 1.0,
+      isFlipped: false,
+      scale: 1.0,
     }))
   );
 
   const handleImagePress = (id: number) => {
     setImages(prevImages =>
       prevImages.map(img => {
-        if (img.id === id ) {
+        if (img.id === id && img.scale < 2.0) {
           const nextScale = Math.min(img.scale * 1.2, 2.0);
           return {
             ...img,
@@ -109,7 +109,7 @@ export default function App() {
           <TouchableOpacity
             key={image.id}
             onPress={() => handleImagePress(image.id)}
-            disabled={image.scale >= 2}
+            // disabled={image.scale >= 2}
             style={styles.gridCell}
           >
             <Image
