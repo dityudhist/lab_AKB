@@ -8,64 +8,71 @@ import {
   Text,
 } from 'react-native';
 
+// Data awal untuk 9 gambar
+// Masing-masing gambar memiliki gambar utama (main) dan alternatif (alt)
+// Properti tambahan:
+// - isFlipped: menandakan apakah gambar sudah diganti ke alternatif
+// - scale: untuk melacak skala gambar (default 1.0)
 const initialImages = [
   {
     id: 1,
     main: 'https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg',
     alt: 'https://i.pinimg.com/736x/9a/1e/db/9a1edb3a20db9a56dd8c7adc4a32ba6a.jpg',
-    isFlipped:false, scale:1
+    isFlipped: false, scale: 1
   },
   {
     id: 2,
     main: 'https://i.pinimg.com/736x/e5/b9/8a/e5b98aa4319968c4785b259a9ccdcb2e.jpg',
     alt: 'https://i.pinimg.com/736x/92/39/c5/9239c5a50c50781c82dcf3006350fece.jpg',
-    isFlipped:false, scale:1
+    isFlipped: false, scale: 1
   },
   {
     id: 3,
     main: 'https://i.pinimg.com/736x/7c/14/c8/7c14c8596bb124afd094a5a4a9b4247b.jpg',
     alt: 'https://i.pinimg.com/736x/83/1d/5b/831d5b81372b8b0192acd49323fb06c6.jpg',
-    isFlipped:false, scale:1
+    isFlipped: false, scale: 1
   },
   {
     id: 4,
     main: 'https://i.pinimg.com/736x/93/ee/ea/93eeea78e003dd356aa0d22f7a15d91f.jpg',
     alt: 'https://i.pinimg.com/736x/25/38/02/253802fab9b96754dd6356bccc9464bb.jpg',
-    isFlipped:false, scale:1
+    isFlipped: false, scale: 1
   },
   {
     id: 5,
     main: 'https://i.pinimg.com/736x/4f/40/d3/4f40d35b156f79a0b421296f0d8f5c32.jpg',
     alt: 'https://i.pinimg.com/736x/83/18/58/83185882b35ffebaef4dde926043f16f.jpg',
-    isFlipped:false, scale:1
+    isFlipped: false, scale: 1
   },
   {
     id: 6,
     main: 'https://i.pinimg.com/736x/c0/0c/ed/c00ceda54d7346b7ffa846edf3be1a08.jpg',
     alt: 'https://i.pinimg.com/736x/11/18/ca/1118ca3ad0419b362f26ae5a1a1c2056.jpg',
-    isFlipped:false, scale:1
+    isFlipped: false, scale: 1
   },
   {
     id: 7,
     main: 'https://i.pinimg.com/736x/cb/51/43/cb51431ce5984f28b1f29314904437c6.jpg',
     alt: 'https://i.pinimg.com/736x/06/0f/4b/060f4b51059a74ca7880e0a136a25788.jpg',
-    isFlipped:false, scale:1
+    isFlipped: false, scale: 1
   },
   {
     id: 8,
     main: 'https://i.pinimg.com/736x/51/8f/22/518f22aeb8cb1aae2a08dcbf1ca930b9.jpg',
     alt: 'https://i.pinimg.com/1200x/8f/32/0e/8f320ef24a24f093f8ffa474dfb767c8.jpg',
-    isFlipped:false, scale:1
+    isFlipped: false, scale: 1
   },
   {
     id: 9,
     main: 'https://i.pinimg.com/736x/24/46/75/24467588c748f4fb716da446e43e5d62.jpg',
     alt: 'https://i.imgur.com/Z3KU4u7.jpg',
-    isFlipped:false, scale:1
+    isFlipped: false, scale: 1
   },
 ];
 
 export default function App() {
+  // Inisialisasi state 'images' dari initialImages
+  // Setiap gambar akan memiliki properti isFlipped dan scale
   const [images, setImages] = useState(
     initialImages.map(img => ({
       ...img,
@@ -74,15 +81,18 @@ export default function App() {
     }))
   );
 
+  // Fungsi yang dipanggil saat gambar ditekan
   const handleImagePress = (id: number) => {
+    // Update hanya gambar yang sesuai ID dan skalanya < 2.0
     setImages(prevImages =>
       prevImages.map(img => {
         if (img.id === id && img.scale < 2.0) {
+          // Skala berikutnya naik 1.2x lipat, tapi dibatasi maksimal 2.0
           const nextScale = Math.min(img.scale * 1.2, 2.0);
           return {
             ...img,
             scale: nextScale,
-            isFlipped: true,
+            isFlipped: true, // Setelah diklik, ganti gambar jadi versi alternatif
           };
         }
         return img;
@@ -92,7 +102,7 @@ export default function App() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Segitiga, Nama, NIM */}
+      {/* Header: Segitiga, Nama, dan NIM */}
       <View style={styles.header}>
         <View style={styles.triangle} />
         <View style={styles.nameBox}>
@@ -103,20 +113,21 @@ export default function App() {
         </View>
       </View>
 
-      {/* Grid Gambar */}
+      {/* Grid 3x3 Gambar */}
       <View style={styles.gridContainer}>
         {images.map(image => (
           <TouchableOpacity
             key={image.id}
             onPress={() => handleImagePress(image.id)}
-            disabled={image.scale >= 2.0}
+            disabled={image.scale >= 2.0} // Jika sudah 2x, disable klik
             style={styles.gridCell}
           >
             <Image
+              // Pilih gambar alternatif jika sudah diklik
               source={{ uri: image.isFlipped ? image.alt : image.main }}
               style={[
                 styles.gridImage,
-                { transform: [{ scale: image.scale }] },
+                { transform: [{ scale: image.scale }] }, // Terapkan skala ke gambar
               ]}
               resizeMode="cover"
             />
@@ -127,6 +138,7 @@ export default function App() {
   );
 }
 
+// Stylesheet untuk tata letak
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -147,7 +159,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 95,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderBottomColor: 'yellow',
+    borderBottomColor: 'yellow', // Warna segitiga
   },
   nameBox: {
     backgroundColor: 'maroon',
