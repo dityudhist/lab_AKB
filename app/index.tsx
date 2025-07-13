@@ -78,7 +78,7 @@ export default function App() {
     setImages(prevImages =>
       prevImages.map(img => {
         if (img.id === id && img.scale < 2.0) {
-          const nextScale = Math.min(img.scale * 1.2, 2.0);
+          const nextScale = Math.min(img.scale * 1.2, 2.4);
           return {
             ...img,
             scale: nextScale,
