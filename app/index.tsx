@@ -69,8 +69,8 @@ export default function App() {
   const [images, setImages] = useState(
     initialImages.map(img => ({
       ...img,
-      isFlipped: false,
-      scale: 1.0,
+      // isFlipped: false,
+      // scale: 1.0,
     }))
   );
 
