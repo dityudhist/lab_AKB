@@ -82,23 +82,34 @@ export default function App() {
   );
 
   // Fungsi yang dipanggil saat gambar ditekan
-  const handleImagePress = (id: number) => {
-    // Update hanya gambar yang sesuai ID dan skalanya < 2.0
-    setImages(prevImages =>
-      prevImages.map(img => {
-        if (img.id === id && img.scale < 2.0) {
-          // Skala berikutnya naik 1.2x lipat, tapi dibatasi maksimal 2.0
-          const nextScale = Math.min(img.scale * 1.2, 2.0);
+const handleImagePress = (id: number) => {
+  setImages(prevImages =>
+    prevImages.map(img => {
+      if (img.id === id) {
+        // Hitung skala baru
+        const nextScale = img.scale * 1.2;
+
+        // Jika hasilnya sudah 2.0 atau lebih, tetapkan 2.0 dan nonaktifkan klik berikutnya
+        if (nextScale >= 2.0) {
           return {
             ...img,
-            scale: nextScale,
-            isFlipped: true, // Setelah diklik, ganti gambar jadi versi alternatif
+            scale: 2.0,
+            isFlipped: true,
           };
         }
-        return img;
-      })
-    );
-  };
+
+        // Jika masih di bawah 2.0, lanjutkan penskalaan
+        return {
+          ...img,
+          scale: nextScale,
+          isFlipped: true,
+        };
+      }
+      return img;
+    })
+  );
+};
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
