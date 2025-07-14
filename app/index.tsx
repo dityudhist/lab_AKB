@@ -6,119 +6,142 @@ import {
   Pressable,
   Dimensions,
   FlatList,
+  Text,
+  View,
 } from 'react-native';
 
-const imageData = [
+const dataGambar = [
   {
     id: '1',
-    main: 'https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg',
-    alt: 'https://i.pinimg.com/736x/9a/1e/db/9a1edb3a20db9a56dd8c7adc4a32ba6a.jpg',
+    utama: 'https://i.pinimg.com/736x/e3/aa/17/e3aa175ead3fd9064ce4ef128973fd96.jpg',
+    alternatif: 'https://i.pinimg.com/736x/9a/1e/db/9a1edb3a20db9a56dd8c7adc4a32ba6a.jpg',
   },
   {
     id: '2',
-    main: 'https://i.pinimg.com/736x/e5/b9/8a/e5b98aa4319968c4785b259a9ccdcb2e.jpg',
-    alt: 'https://i.pinimg.com/736x/92/39/c5/9239c5a50c50781c82dcf3006350fece.jpg',
+    utama: 'https://i.pinimg.com/736x/e5/b9/8a/e5b98aa4319968c4785b259a9ccdcb2e.jpg',
+    alternatif: 'https://i.pinimg.com/736x/92/39/c5/9239c5a50c50781c82dcf3006350fece.jpg',
   },
   {
     id: '3',
-    main: 'https://i.pinimg.com/736x/7c/14/c8/7c14c8596bb124afd094a5a4a9b4247b.jpg',
-    alt: 'https://i.pinimg.com/736x/83/1d/5b/831d5b81372b8b0192acd49323fb06c6.jpg',
+    utama: 'https://i.pinimg.com/736x/7c/14/c8/7c14c8596bb124afd094a5a4a9b4247b.jpg',
+    alternatif: 'https://i.pinimg.com/736x/83/1d/5b/831d5b81372b8b0192acd49323fb06c6.jpg',
   },
   {
     id: '4',
-    main: 'https://i.pinimg.com/736x/93/ee/ea/93eeea78e003dd356aa0d22f7a15d91f.jpg',
-    alt: 'https://i.pinimg.com/736x/25/38/02/253802fab9b96754dd6356bccc9464bb.jpg',
+    utama: 'https://i.pinimg.com/736x/93/ee/ea/93eeea78e003dd356aa0d22f7a15d91f.jpg',
+    alternatif: 'https://i.pinimg.com/736x/25/38/02/253802fab9b96754dd6356bccc9464bb.jpg',
   },
   {
     id: '5',
-    main: 'https://i.pinimg.com/736x/4f/40/d3/4f40d35b156f79a0b421296f0d8f5c32.jpg',
-    alt: 'https://i.pinimg.com/736x/83/18/58/83185882b35ffebaef4dde926043f16f.jpg',
+    utama: 'https://i.pinimg.com/736x/4f/40/d3/4f40d35b156f79a0b421296f0d8f5c32.jpg',
+    alternatif: 'https://i.pinimg.com/736x/83/18/58/83185882b35ffebaef4dde926043f16f.jpg',
   },
   {
     id: '6',
-    main: 'https://i.pinimg.com/736x/c0/0c/ed/c00ceda54d7346b7ffa846edf3be1a08.jpg',
-    alt: 'https://i.pinimg.com/736x/11/18/ca/1118ca3ad0419b362f26ae5a1a1c2056.jpg',
+    utama: 'https://i.pinimg.com/736x/c0/0c/ed/c00ceda54d7346b7ffa846edf3be1a08.jpg',
+    alternatif: 'https://i.pinimg.com/736x/11/18/ca/1118ca3ad0419b362f26ae5a1a1c2056.jpg',
   },
   {
     id: '7',
-    main: 'https://i.pinimg.com/736x/cb/51/43/cb51431ce5984f28b1f29314904437c6.jpg',
-    alt: 'https://i.pinimg.com/736x/06/0f/4b/060f4b51059a74ca7880e0a136a25788.jpg',
+    utama: 'https://i.pinimg.com/736x/cb/51/43/cb51431ce5984f28b1f29314904437c6.jpg',
+    alternatif: 'https://i.pinimg.com/736x/06/0f/4b/060f4b51059a74ca7880e0a136a25788.jpg',
   },
   {
     id: '8',
-    main: 'https://i.pinimg.com/736x/51/8f/22/518f22aeb8cb1aae2a08dcbf1ca930b9.jpg',
-    alt: 'https://i.pinimg.com/1200x/8f/32/0e/8f320ef24a24f093f8ffa474dfb767c8.jpg',
+    utama: 'https://i.pinimg.com/736x/51/8f/22/518f22aeb8cb1aae2a08dcbf1ca930b9.jpg',
+    alternatif: 'https://i.pinimg.com/1200x/8f/32/0e/8f320ef24a24f093f8ffa474dfb767c8.jpg',
   },
   {
     id: '9',
-    main: 'https://i.pinimg.com/736x/24/46/75/24467588c748f4fb716da446e43e5d62.jpg',
-    alt: 'https://i.imgur.com/Z3KU4u7.jpg',
+    utama: 'https://i.pinimg.com/736x/24/46/75/24467588c748f4fb716da446e43e5d62.jpg',
+    alternatif: 'https://i.imgur.com/Z3KU4u7.jpg',
   },
 ];
 
-const GridImageCell = ({ main, alt }: { main: string; alt: string }) => {
-  const [isAlternate, setIsAlternate] = useState(false);
-  const [scale, setScale] = useState(1);
+const SelGambarGrid = ({ utama, alternatif }: { utama: string; alternatif: string }) => {
+  const [diganti, setDiganti] = useState(false);
+  const [skala, setSkala] = useState(1);
 
-  const handlePress = () => {
-    setIsAlternate(prev => !prev);
-    const newScale = scale * 1.2;
-    setScale(newScale <= 2 ? newScale : 2); // Batas maksimal 2x
+  const saatDitekan = () => {
+    setDiganti(prev => !prev);
+    const skalaBaru = skala * 1.2;
+    setSkala(skalaBaru <= 2 ? skalaBaru : 2); // Maksimal 2x
   };
 
-  const imageUrl = isAlternate ? alt : main;
+  const urlGambar = diganti ? alternatif : utama;
 
   return (
     <Pressable
-      onPress={handlePress}
-      style={[styles.cellContainer, { zIndex: scale > 1 ? 99 : 1 }]}
+      onPress={saatDitekan}
+      style={[gaya.wadahSel, { zIndex: skala > 1 ? 99 : 1 }]}
     >
       <Image
-        source={{ uri: imageUrl }}
-        style={[styles.image, { transform: [{ scale }] }]}
+        source={{ uri: urlGambar }}
+        style={[gaya.gambar, { transform: [{ scale: skala }] }]}
         resizeMode="cover"
       />
     </Pressable>
   );
 };
 
-export default function Index() {
+export default function Beranda() {
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={gaya.areaAman}>
       <FlatList
-        data={imageData}
+        data={dataGambar}
         renderItem={({ item }) => (
-          <GridImageCell main={item.main} alt={item.alt} />
+          <SelGambarGrid utama={item.utama} alternatif={item.alternatif} />
         )}
         keyExtractor={(item) => item.id}
         numColumns={3}
-        key={'three-columns'}
+        key={'tiga-kolom'}
+        ListFooterComponent={
+          <View style={gaya.wadahInfo}>
+            <Text style={gaya.teksNama}>Muhammad Aditya Yudhistira</Text>
+            <Text style={gaya.teksNomor}>105841114122</Text>
+          </View>
+        }
       />
     </SafeAreaView>
   );
 }
 
-const numColumns = 3;
-const gap = 8;
-const screenWidth = Dimensions.get('window').width;
-const totalHorizontalGaps = gap * (numColumns + 1);
-const cellSize = (screenWidth - totalHorizontalGaps) / numColumns;
+const jumlahKolom = 3;
+const jarak = 8;
+const lebarLayar = Dimensions.get('window').width;
+const totalJarakHorizontal = jarak * (jumlahKolom + 1);
+const ukuranSel = (lebarLayar - totalJarakHorizontal) / jumlahKolom;
 
-const styles = StyleSheet.create({
-  safeArea: {
+const gaya = StyleSheet.create({
+  areaAman: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: gap / 2,
+    paddingHorizontal: jarak / 2,
   },
-  cellContainer: {
-    width: cellSize,
-    height: cellSize,
-    margin: gap / 2,
+  wadahSel: {
+    width: ukuranSel,
+    height: ukuranSel,
+    margin: jarak / 2,
     backgroundColor: '#eee',
   },
-  image: {
+  gambar: {
     width: '100%',
     height: '100%',
     borderRadius: 8,
+  },
+  wadahInfo: {
+    marginTop: 24,
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  teksNama: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  teksNomor: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 4,
   },
 });
