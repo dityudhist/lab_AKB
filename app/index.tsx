@@ -59,15 +59,25 @@ const dataGambar = [
 ];
 
 const SelGambarGrid = ({ utama, alternatif }: { utama: string; alternatif: string }) => {
+  // State untuk menyimpan apakah gambar sedang menunjukkan versi alternatif
   const [diganti, setDiganti] = useState(false);
+
+  // State untuk menyimpan nilai skala gambar (default 1.0)
   const [skala, setSkala] = useState(1);
 
+  // Fungsi yang dipanggil saat gambar ditekan
   const saatDitekan = () => {
+    // Ubah gambar antara utama dan alternatif
     setDiganti(prev => !prev);
+
+    // Hitung skala baru: tambahkan 20% dari skala saat ini
     const skalaBaru = skala * 1.2;
-    setSkala(skalaBaru <= 2 ? skalaBaru : 2); // Maksimal 2x
+
+    // Tetapkan skala maksimal 2x (tidak boleh lebih dari 2)
+    setSkala(skalaBaru <= 2 ? skalaBaru : 2);
   };
 
+  // Tentukan URL gambar yang akan ditampilkan
   const urlGambar = diganti ? alternatif : utama;
 
   return (
@@ -77,12 +87,13 @@ const SelGambarGrid = ({ utama, alternatif }: { utama: string; alternatif: strin
     >
       <Image
         source={{ uri: urlGambar }}
-        style={[gaya.gambar, { transform: [{ scale: skala }] }]}
+        style={[gaya.gambar, { transform: [{ scale: skala }] }]} // Terapkan transformasi skala
         resizeMode="cover"
       />
     </Pressable>
   );
 };
+
 
 export default function Beranda() {
   return (
