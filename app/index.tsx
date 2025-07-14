@@ -101,6 +101,10 @@ const gaya = StyleSheet.create({
     height: ukuranSel,
     margin: jarak / 2,
     backgroundColor: '#eee',
+    overflow: 'hidden',
+  alignItems: 'center',
+  justifyContent: 'center',
+
   },
   gambar: {
     width: '100%',
