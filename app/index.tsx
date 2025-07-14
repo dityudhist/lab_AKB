@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 
 /**
- * Image dataset: each item contains a primary and an alternate image URL.
- * These will be displayed in a 3x3 grid.
+ * Dataset: 9 images (primary + alternate)
+ * Each cell will toggle between its two images on press.
  */
 const imageData = [
   { id: '1', primary: 'https://i.pinimg.com/736x/5b/be/35/5bbe354ee3c7c044039dbafe876ffb39.jpg', alternate: 'https://i.pinimg.com/736x/98/05/d1/9805d186ebd59bfad0853c652a43b00a.jpg' },
@@ -27,22 +27,23 @@ const imageData = [
 
 /**
  * ImageCell component:
- * - Handles individual image display and interaction
- * - Each cell can be scaled independently
- * - Toggle between primary and alternate image on press
+ * - Handles tap interaction
+ * - Toggles between primary and alternate image
+ * - Scales up by 1.2x until max 2x
  */
 const ImageCell = ({ primaryUrl, alternateUrl }: { primaryUrl: string; alternateUrl: string }) => {
-  const [useAlternate, setUseAlternate] = useState(false);
-  const [scale, setScale] = useState(1);
+  const [useAlternate, setUseAlternate] = useState(false); // Switch between images
+  const [scale, setScale] = useState(1); // Scale factor
 
   const handlePress = () => {
+    // Switch image and increase scale by 1.2x up to max 2x
     setUseAlternate(prev => !prev);
     const newScale = scale * 1.2;
-    setScale(newScale <= 2 ? newScale : 2); // Max scale is 2x
+    setScale(newScale <= 2 ? newScale : 2);
   };
 
   const handleImageError = () => {
-    Alert.alert("Image Load Failed", "One of the images could not be loaded.");
+    Alert.alert('Image Load Failed', 'Failed to load the image.');
   };
 
   const imageUrl = useAlternate ? alternateUrl : primaryUrl;
@@ -53,7 +54,7 @@ const ImageCell = ({ primaryUrl, alternateUrl }: { primaryUrl: string; alternate
         source={{ uri: imageUrl }}
         style={[styles.image, { transform: [{ scale }] }]}
         resizeMode="cover"
-        onError={handleImageError} // Handle invalid/missing image
+        onError={handleImageError}
       />
     </Pressable>
   );
@@ -61,10 +62,9 @@ const ImageCell = ({ primaryUrl, alternateUrl }: { primaryUrl: string; alternate
 
 /**
  * HomeScreen:
- * - Renders the 3x3 image grid
- * - Each image uses ImageCell component
+ * - Displays 3x3 grid of image cells using FlatList
  */
-export default function HomeScreen() {
+export default function App() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
@@ -77,24 +77,24 @@ export default function HomeScreen() {
         )}
         keyExtractor={(item) => item.id}
         numColumns={3}
-        key="grid"
+        key="image-grid"
       />
     </SafeAreaView>
   );
 }
 
-/////////////////////////
-// Layout Calculations //
-/////////////////////////
-const columns = 3;
+///////////////////////////
+// Layout Calculations  //
+///////////////////////////
+const numColumns = 3;
 const spacing = 8;
 const screenWidth = Dimensions.get('window').width;
-const totalSpacing = spacing * (columns + 1);
-const cellSize = (screenWidth - totalSpacing) / columns;
+const totalSpacing = spacing * (numColumns + 1);
+const cellSize = (screenWidth - totalSpacing) / numColumns;
 
-//////////////////////
-// Styling Section  //
-//////////////////////
+///////////////////////////
+// Styles                //
+///////////////////////////
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
