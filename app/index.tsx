@@ -7,21 +7,59 @@ import {
   Dimensions,
   FlatList,
   Alert,
-  ViewStyle,
-  ImageStyle,
 } from 'react-native';
 
-// =======================
-// TIPE DATA PROPS GAMBAR
-// =======================
+/**
+ * Tipe properti untuk komponen sel gambar individual
+ */
 type ImageCellProps = {
   primaryUrl: string;
   alternateUrl: string;
 };
 
-// ============================
-// DATA 9 GAMBAR UTAMA & CADANGAN
-// ============================
+/**
+ * Komponen individual untuk setiap sel gambar dalam grid
+ * - Menangani penskalaan individu (scale)
+ * - Berganti ke gambar alternatif saat diklik
+ * - Maksimum penskalaan: 2x
+ */
+const ImageCell: React.FC<ImageCellProps> = ({ primaryUrl, alternateUrl }) => {
+  const [useAlternate, setUseAlternate] = useState(false);
+  const [scale, setScale] = useState(1);
+
+  /**
+   * Saat gambar diklik:
+   * - Ganti gambar utama <-> alternatif
+   * - Perbesar gambar 1.2x jika belum mencapai skala maksimal
+   */
+  const handlePress = () => {
+    const newScale = scale * 1.2;
+    setUseAlternate(prev => !prev);
+    setScale(newScale <= 2 ? newScale : 2); // Maksimal 2x
+  };
+
+  /**
+   * Penanganan jika gambar gagal dimuat
+   */
+  const handleImageError = () => {
+    Alert.alert('Error', 'Gagal memuat gambar.');
+  };
+
+  return (
+    <Pressable onPress={handlePress} style={[styles.cell, { zIndex: scale > 1 ? 1 : 0 }]}>
+      <Image
+        source={{ uri: useAlternate ? alternateUrl : primaryUrl }}
+        style={[styles.image, { transform: [{ scale }] }]}
+        resizeMode="cover"
+        onError={handleImageError}
+      />
+    </Pressable>
+  );
+};
+
+/**
+ * Dataset gambar utama dan alternatif (9 pasang gambar)
+ */
 const imageData = [
   {
     id: '1',
@@ -70,52 +108,9 @@ const imageData = [
   },
 ];
 
-// ==========================================
-// KOMPONEN INDIVIDU UNTUK TIAP GAMBAR DALAM GRID
-// ==========================================
-const ImageCell: React.FC<ImageCellProps> = ({ primaryUrl, alternateUrl }) => {
-  const [useAlternate, setUseAlternate] = useState<boolean>(false);
-  const [scale, setScale] = useState<number>(1);
-
-  // Fungsi ketika gambar ditekan
-  const handlePress = (): void => {
-    const newScale = scale * 1.2;
-    setUseAlternate(prev => !prev);
-    setScale(newScale <= 2 ? newScale : 2); // Maksimal skala 2x
-  };
-
-  // Penanganan error gambar
-  const handleImageError = (): void => {
-    Alert.alert('Image Load Failed', 'Failed to load the image.');
-  };
-
-  // Pilih URL yang akan ditampilkan (utama/alternatif)
-  const imageUrl: string = useAlternate ? alternateUrl : primaryUrl;
-
-  // Gaya dinamis
-  const containerStyle: ViewStyle = {
-    zIndex: scale > 1 ? 99 : 1,
-  };
-
-  const imageStyle: ImageStyle = {
-    transform: [{ scale }],
-  };
-
-  return (
-    <Pressable onPress={handlePress} style={[styles.cell, containerStyle]}>
-      <Image
-        source={{ uri: imageUrl }}
-        style={[styles.image, imageStyle]}
-        resizeMode="cover"
-        onError={handleImageError}
-      />
-    </Pressable>
-  );
-};
-
-// ====================================
-// KOMPONEN UTAMA - MENAMPILKAN GRID
-// ====================================
+/**
+ * Komponen utama yang menampilkan semua gambar dalam grid 3x3
+ */
 export default function App() {
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -124,28 +119,22 @@ export default function App() {
         keyExtractor={(item) => item.id}
         numColumns={3}
         renderItem={({ item }) => (
-          <ImageCell
-            primaryUrl={item.primary}
-            alternateUrl={item.alternate}
-          />
+          <ImageCell primaryUrl={item.primary} alternateUrl={item.alternate} />
         )}
       />
     </SafeAreaView>
   );
 }
 
-// =======================
-// PERHITUNGAN UKURAN SEL
-// =======================
+/**
+ * Gaya dan perhitungan ukuran cell agar semua sel gambar sama besar
+ */
 const numColumns = 3;
 const spacing = 8;
 const screenWidth = Dimensions.get('window').width;
 const totalSpacing = spacing * (numColumns + 1);
 const cellSize = (screenWidth - totalSpacing) / numColumns;
 
-// ==============
-// GAYA LAYOUT
-// ==============
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -157,9 +146,9 @@ const styles = StyleSheet.create({
     height: cellSize,
     margin: spacing / 2,
     backgroundColor: '#eee',
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden',
   },
   image: {
     width: '100%',
