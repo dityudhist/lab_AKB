@@ -116,7 +116,7 @@ const ImageCell: React.FC<ImageCellProps> = ({ primaryUrl, alternateUrl }) => {
 // ====================================
 // KOMPONEN UTAMA - MENAMPILKAN GRID
 // ====================================
-export default function App(): JSX.Element {
+export default function App() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
