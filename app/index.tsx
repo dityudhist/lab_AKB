@@ -6,9 +6,6 @@ import {
   Pressable,
   Dimensions,
   FlatList,
-  ScrollView,
-  Text,
-  View,
 } from 'react-native';
 
 const imageData = [
@@ -66,7 +63,7 @@ const GridImageCell = ({ main, alt }: { main: string; alt: string }) => {
   const handlePress = () => {
     setIsAlternate(prev => !prev);
     const newScale = scale * 1.2;
-    setScale(newScale <= 2 ? newScale : 2); // Max 2x
+    setScale(newScale <= 2 ? newScale : 2); // Batas maksimal 2x
   };
 
   const imageUrl = isAlternate ? alt : main;
@@ -88,28 +85,21 @@ const GridImageCell = ({ main, alt }: { main: string; alt: string }) => {
 export default function Index() {
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView>
-        <FlatList
-          data={imageData}
-          renderItem={({ item }) => (
-            <GridImageCell main={item.main} alt={item.alt} />
-          )}
-          keyExtractor={(item) => item.id}
-          numColumns={3}
-          key={'three-columns'}
-          scrollEnabled={false}
-        />
-        <View style={styles.infoContainer}>
-          <Text style={styles.nameText}>Muhammad Aditya Yudhistira</Text>
-          <Text style={styles.numberText}>105841114122</Text>
-        </View>
-      </ScrollView>
+      <FlatList
+        data={imageData}
+        renderItem={({ item }) => (
+          <GridImageCell main={item.main} alt={item.alt} />
+        )}
+        keyExtractor={(item) => item.id}
+        numColumns={3}
+        key={'three-columns'}
+      />
     </SafeAreaView>
   );
 }
 
 const numColumns = 3;
-const gap = 10;
+const gap = 8;
 const screenWidth = Dimensions.get('window').width;
 const totalHorizontalGaps = gap * (numColumns + 1);
 const cellSize = (screenWidth - totalHorizontalGaps) / numColumns;
@@ -130,20 +120,5 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 8,
-  },
-  infoContainer: {
-    marginTop: 24,
-    alignItems: 'center',
-    paddingBottom: 24,
-  },
-  nameText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  numberText: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 4,
   },
 });
