@@ -10,7 +10,7 @@ export default function RootLayout() {
 
   const [loaded, error] = useFonts({
     //font variable
-    "merriweather": require("../assets/fonts/Merriweather-VariableFont_opsz,wdth,wght.ttf"),
+    "merriweather": require("../assets/fonts/Merriweather-VariableFont_opsz-wdth-wght.ttf"),
     "oswald": require("../assets/fonts/Oswald-VariableFont_wght.ttf"),
     "raleway": require("../assets/fonts/Raleway-VariableFont_wght.ttf"),
     "roboto": require("../assets/fonts/RobotoMono-VariableFont_wght.ttf"),
