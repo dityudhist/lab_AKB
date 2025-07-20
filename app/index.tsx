@@ -1,158 +1,66 @@
-import React, { useState } from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  Image,
-  Pressable,
-  Dimensions,
-  FlatList,
-  Alert,
-} from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
 
-/**
- * Tipe properti untuk komponen sel gambar individual
- */
-type ImageCellProps = {
-  primaryUrl: string;
-  alternateUrl: string;
-};
-
-/**
- * Komponen individual untuk setiap sel gambar dalam grid
- * - Menangani penskalaan individu (scale)
- * - Berganti ke gambar alternatif saat diklik
- * - Maksimum penskalaan: 2x
- */
-const ImageCell: React.FC<ImageCellProps> = ({ primaryUrl, alternateUrl }) => {
-  const [useAlternate, setUseAlternate] = useState(false);
-  const [scale, setScale] = useState(1);
-
-  /**
-   * Saat gambar diklik:
-   * - Ganti gambar utama <-> alternatif
-   * - Perbesar gambar 1.2x jika belum mencapai skala maksimal
-   */
-  const handlePress = () => {
-    const newScale = scale * 1.2;
-    setUseAlternate(prev => !prev);
-    setScale(newScale <= 2 ? newScale : 2); // Maksimal 2x
-  };
-
-  /**
-   * Penanganan jika gambar gagal dimuat
-   */
-  const handleImageError = () => {
-    Alert.alert('Error', 'Gagal memuat gambar.');
-  };
+export default function Index() {
+  const namaMahasiswa = [
+    { nama: "Abdul Naim - 105841113622", font: "ubuntu" },
+    { nama: "Syahrul Ramadhan - 105841113722", font: "merriweather" },
+    { nama: "Abdullah Khaerunna Anwar - 105841113822", font: "barlowCondensed" },
+    { nama: "Muh Irsyad Jafar - 105841113922", font: "oswald" },
+    { nama: "Alryadi Asmuadzan - 105841114022", font: "ptsans" },
+    { nama: "Wiwin Fuad Sanjaya - 105841114222", font: "raleway" },
+    { nama: "Muh Ayyub Hasrul - 105841114322", font: "roboto" },
+    { nama: "Muhammad Alif Syafan - 105841114422", font: "rubik" },
+    { nama: "Muh Imam Ma'ruf Musni - 105841114522", font: "tiktoksans" },
+    { nama: "Muh Abdullah Zufar - 105841114622", font: "tilitium" },
+  ];
 
   return (
-    <Pressable onPress={handlePress} style={[styles.cell, { zIndex: scale > 1 ? 1 : 0 }]}>
-      <Image
-        source={{ uri: useAlternate ? alternateUrl : primaryUrl }}
-        style={[styles.image, { transform: [{ scale }] }]}
-        resizeMode="cover"
-        onError={handleImageError}
-      />
-    </Pressable>
-  );
-};
-
-/**
- * Dataset gambar utama dan alternatif (9 pasang gambar)
- */
-const imageData = [
-  {
-    id: '1',
-    primary: 'https://picsum.photos/id/10/200',
-    alternate: 'https://picsum.photos/id/1/200',
-  },
-  {
-    id: '2',
-    primary: 'https://picsum.photos/id/2/200',
-    alternate: 'https://picsum.photos/id/99/200',
-  },
-  {
-    id: '3',
-    primary: 'https://picsum.photos/id/12/200',
-    alternate: 'https://picsum.photos/id/98/200',
-  },
-  {
-    id: '4',
-    primary: 'https://picsum.photos/id/65/200',
-    alternate: 'https://picsum.photos/id/96/200',
-  },
-  {
-    id: '5',
-    primary: 'https://picsum.photos/id/95/200',
-    alternate: 'https://picsum.photos/id/94/200',
-  },
-  {
-    id: '6',
-    primary: 'https://picsum.photos/id/93/200',
-    alternate: 'https://picsum.photos/id/92/200',
-  },
-  {
-    id: '7',
-    primary: 'https://picsum.photos/id/91/200',
-    alternate: 'https://picsum.photos/id/90/200',
-  },
-  {
-    id: '8',
-    primary: 'https://picsum.photos/id/89/200',
-    alternate: 'https://picsum.photos/id/88/200',
-  },
-  {
-    id: '9',
-    primary: 'https://picsum.photos/id/87/200',
-    alternate: 'https://picsum.photos/id/86/200',
-  },
-];
-
-/**
- * Komponen utama yang menampilkan semua gambar dalam grid 3x3
- */
-export default function App() {
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <FlatList
-        data={imageData}
-        keyExtractor={(item) => item.id}
-        numColumns={3}
-        renderItem={({ item }) => (
-          <ImageCell primaryUrl={item.primary} alternateUrl={item.alternate} />
-        )}
-      />
-    </SafeAreaView>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}> Daftar Nama</Text>
+      {namaMahasiswa.map((item, index) => (
+        <View key={index} style={styles.card}>
+          <Text style={[styles.namaText, { fontFamily: item.font }]}>
+            {item.nama}
+          </Text>
+        </View>
+      ))}
+    </ScrollView>
   );
 }
 
-/**
- * Gaya dan perhitungan ukuran cell agar semua sel gambar sama besar
- */
-const numColumns = 3;
-const spacing = 8;
-const screenWidth = Dimensions.get('window').width;
-const totalSpacing = spacing * (numColumns + 1);
-const cellSize = (screenWidth - totalSpacing) / numColumns;
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: spacing / 2,
+  container: {
+    paddingVertical: 50,
+    paddingHorizontal: 24,
+    backgroundColor: "#EEF2F7",
+    alignItems: "center",
   },
-  cell: {
-    width: cellSize,
-    height: cellSize,
-    margin: spacing / 2,
-    backgroundColor: '#eee',
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#2c3e50",
+    marginBottom: 30,
+    textAlign: "center",
   },
-  image: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 8,
+  card: {
+    width: width * 0.9,
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#e6ecf1",
+  },
+  namaText: {
+    fontSize: 18,
+    color: "#34495e",
   },
 });
