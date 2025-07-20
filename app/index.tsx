@@ -1,24 +1,55 @@
 import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
 
-export default function Index() {
-  const namaMahasiswa = [
-    { nama: "Abdul Naim - 105841113622", font: "ubuntu" },
-    { nama: "Syahrul Ramadhan - 105841113722", font: "merriweather" },
-    { nama: "Abdullah Khaerunna Anwar - 105841113822", font: "barlowCondensed" },
-    { nama: "Muh Irsyad Jafar - 105841113922", font: "oswald" },
-    { nama: "Alryadi Asmuadzan - 105841114022", font: "ptsans" },
-    { nama: "Wiwin Fuad Sanjaya - 105841114222", font: "raleway" },
-    { nama: "Muh Ayyub Hasrul - 105841114322", font: "roboto" },
-    { nama: "Muhammad Alif Syafan - 105841114422", font: "rubik" },
-    { nama: "Muh Imam Ma'ruf Musni - 105841114522", font: "tiktoksans" },
-    { nama: "Muh Abdullah Zufar - 105841114622", font: "tilitium" },
-  ];
+const stambukPatokan = 105841114122;
 
+const namaMahasiswa = [
+  { nama: "Abdul Naim - 105841113622", font: "opensans-regular" },
+  { nama: "Syahrul Ramadhan - 105841113722", font: "opensans-bold" },
+  { nama: "Abdullah Khaerunna Anwar - 105841113822", font: "lato-light" },
+  { nama: "Muh Irsyad Jafar - 105841113922", font: "lato-bold" },
+  { nama: "Alryadi Asmuadzan - 105841114022", font: "montserrat-medium" },
+  { nama: "Wiwin Fuad Sanjaya - 105841114222", font: "merriweather" },
+  { nama: "Muh Ayyub Hasrul - 105841114322", font: "oswald" },
+  { nama: "Muhammad Alif Syafan - 105841114422", font: "raleway" },
+  { nama: "Muh Imam Ma'ruf Musni - 105841114522", font: "roboto" },
+  { nama: "Muh Abdullah Zufar - 105841114622", font: "tiktoksans" },
+];
+
+// Urutkan berdasarkan stambuk (low index numbers dulu)
+const sortedNama = [...namaMahasiswa].sort((a, b) => {
+  const stambukA = parseInt(a.nama.split("-")[1].trim());
+  const stambukB = parseInt(b.nama.split("-")[1].trim());
+  return stambukA - stambukB;
+});
+
+// Pisahkan sebelum dan sesudah patokan
+const sebelum = sortedNama.filter((item) => {
+  const stambuk = parseInt(item.nama.split("-")[1].trim());
+  return stambuk < stambukPatokan;
+});
+
+const sesudah = sortedNama.filter((item) => {
+  const stambuk = parseInt(item.nama.split("-")[1].trim());
+  return stambuk > stambukPatokan;
+});
+
+export default function Index() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}> Daftar Nama</Text>
-      {namaMahasiswa.map((item, index) => (
-        <View key={index} style={styles.card}>
+      <Text style={styles.title}>Daftar Nama Mahasiswa</Text>
+
+      <Text style={styles.subTitle}>Sebelum Stambuk {stambukPatokan}</Text>
+      {sebelum.map((item, index) => (
+        <View key={`sbl-${index}`} style={styles.card}>
+          <Text style={[styles.namaText, { fontFamily: item.font }]}>
+            {item.nama}
+          </Text>
+        </View>
+      ))}
+
+      <Text style={styles.subTitle}>Sesudah Stambuk {stambukPatokan}</Text>
+      {sesudah.map((item, index) => (
+        <View key={`ssd-${index}`} style={styles.card}>
           <Text style={[styles.namaText, { fontFamily: item.font }]}>
             {item.nama}
           </Text>
@@ -32,7 +63,7 @@ const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 50,
+    paddingVertical: 40,
     paddingHorizontal: 24,
     backgroundColor: "#EEF2F7",
     alignItems: "center",
@@ -43,6 +74,14 @@ const styles = StyleSheet.create({
     color: "#2c3e50",
     marginBottom: 30,
     textAlign: "center",
+  },
+  subTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginTop: 20,
+    marginBottom: 10,
+    color: "#34495e",
+    alignSelf: "flex-start",
   },
   card: {
     width: width * 0.9,
