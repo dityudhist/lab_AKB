@@ -3,11 +3,11 @@ import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
 const stambukPatokan = 105841114122;
 
 const namaMahasiswa = [
-  { nama: "Abdul Naim - 105841113622", font: "opensans-regular" },
-  { nama: "Syahrul Ramadhan - 105841113722", font: "opensans-bold" },
-  { nama: "Abdullah Khaerunna Anwar - 105841113822", font: "lato-light" },
-  { nama: "Muh Irsyad Jafar - 105841113922", font: "lato-bold" },
-  { nama: "Alryadi Asmuadzan - 105841114022", font: "montserrat-medium" },
+  { nama: "Abdul Naim - 105841113622", font: "ubuntu" },
+  { nama: "Syahrul Ramadhan - 105841113722", font: "barlowCondensed" },
+  { nama: "Abdullah Khaerunna Anwar - 105841113822", font: "ptsans" },
+  { nama: "Muh Irsyad Jafar - 105841113922", font: "rubik" },
+  { nama: "Alryadi Asmuadzan - 105841114022", font: "tilitium" },
   { nama: "Wiwin Fuad Sanjaya - 105841114222", font: "merriweather" },
   { nama: "Muh Ayyub Hasrul - 105841114322", font: "oswald" },
   { nama: "Muhammad Alif Syafan - 105841114422", font: "raleway" },
