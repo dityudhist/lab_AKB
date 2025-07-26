@@ -1,105 +1,78 @@
-import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
+import Feather from '@expo/vector-icons/Feather';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import Foundation from '@expo/vector-icons/Foundation';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Octicons from '@expo/vector-icons/Octicons';
 
-const stambukPatokan = 105841114122;
-
-const namaMahasiswa = [
-  { nama: "Abdul Naim - 105841113622", font: "ubuntu" },
-  { nama: "Syahrul Ramadhan - 105841113722", font: "barlowCondensed" },
-  { nama: "Abdullah Khaerunna Anwar - 105841113822", font: "ptsans" },
-  { nama: "Muh Irsyad Jafar - 105841113922", font: "rubik" },
-  { nama: "Alryadi Asmuadzan - 105841114022", font: "tilitium" },
-  { nama: "Wiwin Fuad Sanjaya - 105841114222", font: "merriweather" },
-  { nama: "Muh Ayyub Hasrul - 105841114322", font: "oswald" },
-  { nama: "Muhammad Alif Syafan - 105841114422", font: "raleway" },
-  { nama: "Muh Imam Ma'ruf Musni - 105841114522", font: "roboto" },
-  { nama: "Muh Abdullah Zufar - 105841114622", font: "tiktoksans" },
-];
-
-// Urutkan berdasarkan stambuk (low index numbers dulu)
-const sortedNama = [...namaMahasiswa].sort((a, b) => {
-  const stambukA = parseInt(a.nama.split("-")[1].trim());
-  const stambukB = parseInt(b.nama.split("-")[1].trim());
-  return stambukA - stambukB;
-});
-
-// Pisahkan sebelum dan sesudah patokan
-const sebelum = sortedNama.filter((item) => {
-  const stambuk = parseInt(item.nama.split("-")[1].trim());
-  return stambuk < stambukPatokan;
-});
-
-const sesudah = sortedNama.filter((item) => {
-  const stambuk = parseInt(item.nama.split("-")[1].trim());
-  return stambuk > stambukPatokan;
-});
-
-export default function Index() {
+const Tugas6 = () => {
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Daftar Nama Mahasiswa</Text>
+    <ScrollView contentContainerStyle={styles.wrapper}>
+      <Text style={styles.heading}>Tugas 6</Text>
+      <Text style={styles.subheading}>Muhammad Aditya Yudhistira</Text>
+      <Text style={styles.subheading}>105841114122</Text>
 
-      <Text style={styles.subTitle}>Sebelum Stambuk {stambukPatokan}</Text>
-      {sebelum.map((item, index) => (
-        <View key={`sbl-${index}`} style={styles.card}>
-          <Text style={[styles.namaText, { fontFamily: item.font }]}>
-            {item.nama}
-          </Text>
-        </View>
-      ))}
-
-      <Text style={styles.subTitle}>Sesudah Stambuk {stambukPatokan}</Text>
-      {sesudah.map((item, index) => (
-        <View key={`ssd-${index}`} style={styles.card}>
-          <Text style={[styles.namaText, { fontFamily: item.font }]}>
-            {item.nama}
-          </Text>
-        </View>
-      ))}
+      <View style={styles.iconGrid}>
+        <View style={styles.iconBox}><AntDesign name="star" size={28} color="crimson" /></View>
+        <View style={styles.iconBox}><Entypo name="moon" size={28} color="slategray" /></View>
+        <View style={styles.iconBox}><EvilIcons name="arrow-down" size={28} color="#444" /></View>
+        <View style={styles.iconBox}><Feather name="airplay" size={28} color="#333" /></View>
+        <View style={styles.iconBox}><FontAwesome name="heart" size={28} color="hotpink" /></View>
+        <View style={styles.iconBox}><Fontisto name="bower" size={24} color="#555" /></View>
+        <View style={styles.iconBox}><Foundation name="anchor" size={28} color="#2a2a2a" /></View>
+        <View style={styles.iconBox}><Ionicons name="alert-circle" size={28} color="#b22222" /></View>
+        <View style={styles.iconBox}><MaterialCommunityIcons name="account-clock" size={28} color="#1e90ff" /></View>
+        <View style={styles.iconBox}><Octicons name="file-submodule" size={28} color="#8b008b" /></View>
+      </View>
     </ScrollView>
   );
-}
-
-const { width } = Dimensions.get("window");
+};
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 40,
-    paddingHorizontal: 24,
-    backgroundColor: "#EEF2F7",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#2c3e50",
-    marginBottom: 30,
-    textAlign: "center",
-  },
-  subTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginTop: 20,
-    marginBottom: 10,
-    color: "#34495e",
-    alignSelf: "flex-start",
-  },
-  card: {
-    width: width * 0.9,
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    paddingVertical: 18,
+  wrapper: {
+    paddingVertical: 30,
     paddingHorizontal: 20,
-    marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: "#e6ecf1",
+    backgroundColor: '#f2f2f2',
+    alignItems: 'center',
+    flexGrow: 1,
   },
-  namaText: {
+  heading: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#2c3e50',
+  },
+  subheading: {
     fontSize: 18,
-    color: "#34495e",
+    color: '#555',
+    marginBottom: 5,
+  },
+  iconGrid: {
+    marginTop: 25,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 20,
+  },
+  iconBox: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4, // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
 });
+
+export default Tugas6;
